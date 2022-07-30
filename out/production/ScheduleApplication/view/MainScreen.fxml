@@ -1,14 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="$CONTROLLER_NAME$"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Main">
+   <children>
+      <VBox layoutX="-2.0" layoutY="-2.0" prefHeight="706.0" prefWidth="807.0">
+         <children>
+            <Pane prefHeight="55.0" prefWidth="807.0">
+               <children>
+                  <Label layoutX="318.0" layoutY="16.0" prefHeight="24.0" prefWidth="171.0" text="Schedule Application" textFill="#005d6e">
+                     <font>
+                        <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+            <Pane prefHeight="620.0" prefWidth="807.0">
+               <children>
+                  <VBox layoutX="2.0" prefHeight="614.0" prefWidth="805.0">
+                     <children>
+                        <Pane prefHeight="377.0" prefWidth="807.0">
+                           <children>
+                              <TableView layoutX="14.0" layoutY="40.0" prefHeight="313.0" prefWidth="591.0">
+                                <columns>
+                                  <TableColumn prefWidth="75.0" text="C1" />
+                                  <TableColumn prefWidth="75.0" text="C2" />
+                                </columns>
+                              </TableView>
+                              <Label layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="171.0" text="Appointments" textFill="#005d6e">
+                                 <font>
+                                    <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
+                                 </font>
+                              </Label>
+                              <Button layoutX="375.0" layoutY="13.0" mnemonicParsing="false" text="Search" />
+                              <TextField layoutX="445.0" layoutY="13.0" />
+                              <GridPane layoutX="632.0" layoutY="66.0" prefHeight="261.0" prefWidth="159.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#onActionOpenAddAppointment" text="Add Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" onAction="#onActionOpenModifyAppointment" text="Modify Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" text="Delete Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                                    <RadioButton mnemonicParsing="false" text="View All" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                                    <RadioButton mnemonicParsing="false" text="View Month" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                    <RadioButton mnemonicParsing="false" text="View Week" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </Pane>
+                        <Pane prefHeight="237.0" prefWidth="805.0">
+                           <children>
+                              <TableView layoutX="14.0" layoutY="40.0" prefHeight="193.0" prefWidth="591.0">
+                                <columns>
+                                  <TableColumn prefWidth="75.0" text="C1" />
+                                  <TableColumn prefWidth="75.0" text="C2" />
+                                </columns>
+                              </TableView>
+                              <Label layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="171.0" text="Customers" textFill="#005d6e">
+                                 <font>
+                                    <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
+                                 </font>
+                              </Label>
+                              <Button layoutX="375.0" layoutY="13.0" mnemonicParsing="false" text="Search" />
+                              <TextField layoutX="445.0" layoutY="13.0" />
+                              <GridPane layoutX="636.0" layoutY="43.0" prefHeight="140.0" prefWidth="145.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#onActionOpenAddCustomer" text="Add Customer" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" onAction="#onActionOpenModifyCustomer" text="Modify Customer" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" text="Delete Customer" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </Pane>
+                     </children>
+                  </VBox>
+               </children>
+            </Pane>
+            <Pane prefHeight="50.0" prefWidth="807.0">
+               <children>
+                  <Button layoutX="14.0" layoutY="9.0" mnemonicParsing="false" onAction="#onActionOpenReports" text="Reports" />
+                  <Button layoutX="740.0" layoutY="9.0" mnemonicParsing="false" text="Logoff" />
+               </children>
+            </Pane>
+         </children>
+      </VBox>
+   </children>
 </AnchorPane>

@@ -8,13 +8,38 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import misc.Database;
+
+import javax.xml.crypto.Data;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main extends Application {
-    @Override
+      @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/view/LoginScreen.fxml"));
-        stage.setTitle("Schedule");
-        stage.setScene(new Scene(root, 600, 400));
-        stage.show();
+         Parent root = FXMLLoader.load(getClass().getResource("/view/LoginScreen.fxml"));
+         stage.setTitle("Schedule");
+         stage.setScene(new Scene(root, 600, 400));
+         stage.show();
+     }
+
+    public static void main (String[] args) throws SQLException, ClassNotFoundException {
+          Database.openConnection();
+          launch(args);
+
+
+          //Random print statment checking Database connection
+            Statement statement = Database.getConnection().createStatement();
+            ResultSet resultSet = statement.executeQuery("select * from customers");
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString("Customer_Name"));
+            }
+
+          Database.closeConnection();
     }
-}
+
+
+ }
+
+

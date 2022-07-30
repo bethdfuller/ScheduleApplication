@@ -39,25 +39,27 @@
                      <children>
                         <Label text="Username" />
                         <Label text="Password" GridPane.rowIndex="1" />
-                        <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField prefHeight="26.0" prefWidth="208.0" GridPane.columnIndex="1" />
+                        <TextField fx:id="usernameField" prefHeight="26.0" prefWidth="208.0" GridPane.columnIndex="1" />
+                        <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </children>
                   </GridPane>
                </children>
             </Pane>
             <Pane prefHeight="111.0" prefWidth="433.0">
                <children>
-                  <GridPane layoutX="128.0" layoutY="14.0" prefHeight="34.0" prefWidth="191.0">
+                  <GridPane layoutX="121.0" layoutY="22.0" prefHeight="34.0" prefWidth="191.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Button mnemonicParsing="false" text="Login" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                        <Button mnemonicParsing="false" text="Reset" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#onActionLogin" text="Login" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#onActionReset" text="Reset" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                        <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onActionExit" text="Exit" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                      </children>
                   </GridPane>
                </children>
