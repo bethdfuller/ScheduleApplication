@@ -45,7 +45,7 @@
                   </GridPane>
                </children>
             </Pane>
-            <Pane prefHeight="111.0" prefWidth="433.0">
+            <Pane prefHeight="103.0" prefWidth="457.0">
                <children>
                   <GridPane layoutX="121.0" layoutY="22.0" prefHeight="34.0" prefWidth="191.0">
                     <columnConstraints>
@@ -62,6 +62,7 @@
                         <Button fx:id="exitButton" mnemonicParsing="false" onAction="#onActionExit" text="Exit" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                      </children>
                   </GridPane>
+                  <Label fx:id="UserLocationLabel" layoutX="312.0" layoutY="89.0" text="USER'S LOCATION" />
                </children>
             </Pane>
          </children>

@@ -27,19 +27,7 @@ public class Main extends Application {
     public static void main (String[] args) throws SQLException, ClassNotFoundException {
           Database.openConnection();
           launch(args);
-
-
-          //Random print statment checking Database connection
-            Statement statement = Database.getConnection().createStatement();
-            ResultSet resultSet = statement.executeQuery("select * from customers");
-            while (resultSet.next()) {
-                System.out.println(resultSet.getString("Customer_Name"));
-            }
-
-          Database.closeConnection();
     }
-
-
  }
 
 

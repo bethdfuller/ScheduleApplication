@@ -11,8 +11,9 @@ public class Database {
     private static final String DatabaseUsername = "sqlUser";
     private static final String DatabasePassword = "Passw0rd!";
     private static final String DatabaseJDBCDriver = "com.mysql.jdbc.Driver";
-    static Connection connection;
+    public static Connection connection;
 
+    public Database() {};
 
     //Open Connection
     public static void openConnection() throws ClassNotFoundException, SQLException {
@@ -33,4 +34,7 @@ public class Database {
         connection.close();
         System.out.println("Connection Closed");
     }
+
+    public static Connection connection () {return connection;};
+
 }

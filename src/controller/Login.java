@@ -2,7 +2,8 @@ package controller;
 
 import javafx.scene.control.*;
 import misc.Log;
-import model.UserDatabase;
+import misc.TimeZoneInterface;
+import model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.time.ZoneId;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class Login implements Initializable {
@@ -31,12 +34,18 @@ public class Login implements Initializable {
     @FXML Button loginButton;
     @FXML Button resetButton;
     @FXML Button exitButton;
+    @FXML private Label UserLocationLabel;
+
+    //Define alerts
+    private String alertTitle;
+    private String alertHeader;
+    private String alertContent;
 
     //Login
     public void onActionLogin(ActionEvent event) throws IOException {
         String username = usernameField.getText();
         String password = passwordField.getText();
-        boolean verifiedUser = UserDatabase.login(username, password);
+        boolean verifiedUser = User.login(username, password);
         if(verifiedUser == true) {
 
             //Log successful login
@@ -53,8 +62,9 @@ public class Login implements Initializable {
             Log.logEvent(username, false, "Login");
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setContentText("Invalid username/password input.");
+            alert.setTitle(alertTitle);
+            alert.setHeaderText(alertHeader);
+            alert.setContentText(alertContent);
             alert.showAndWait();
 
         }
@@ -74,6 +84,22 @@ public class Login implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        //Display user's timezone (using Lambda expression)
+        TimeZoneInterface display = () -> "Time Zone: " + ZoneId.systemDefault().toString();
+        UserLocationLabel.setText(display.getUserTimeZone());
+
+        Locale locale = Locale.getDefault();
+        resourceBundle = ResourceBundle.getBundle("misc/LanguageResourceBundle", locale);
+        ScheduleLoginTitle.setText(resourceBundle.getString("ScheduleLogin"));
+        UsernameLabel.setText(resourceBundle.getString("Username"));
+        PasswordLabel.setText(resourceBundle.getString("Password"));
+        loginButton.setText(resourceBundle.getString("login"));
+        resetButton.setText(resourceBundle.getString("reset"));
+        exitButton.setText(resourceBundle.getString("exit"));
+        alertTitle = resourceBundle.getString("alertTitle");
+        alertHeader = resourceBundle.getString("alertHeader");
+        alertContent = resourceBundle.getString("alertContent");
 
     }
 }
