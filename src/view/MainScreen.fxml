@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -33,10 +34,18 @@
                      <children>
                         <Pane prefHeight="377.0" prefWidth="807.0">
                            <children>
-                              <TableView layoutX="14.0" layoutY="40.0" prefHeight="313.0" prefWidth="591.0">
+                              <TableView fx:id="appointmentTableView" layoutX="14.0" layoutY="40.0" prefHeight="313.0" prefWidth="591.0">
                                 <columns>
-                                  <TableColumn prefWidth="75.0" text="C1" />
-                                  <TableColumn prefWidth="75.0" text="C2" />
+                                  <TableColumn fx:id="AppointmentIDCol" prefWidth="91.0" text="Appointment ID" />
+                                  <TableColumn fx:id="AppointmentTitleCol" minWidth="0.0" prefWidth="92.0" text="Title" />
+                                    <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="67.0" text="Description" />
+                                    <TableColumn fx:id="AppointmentLocationCol" prefWidth="53.0" text="Location" />
+                                    <TableColumn fx:id="AppointmentTypeCol" prefWidth="34.0" text="Type" />
+                                    <TableColumn fx:id="AppointmentStartCol" prefWidth="35.0" text="Start" />
+                                    <TableColumn fx:id="AppointmentEndCol" prefWidth="30.0" text="End" />
+                                    <TableColumn fx:id="AppointmentCustomerIDCol" prefWidth="77.0" text="Customer ID" />
+                                    <TableColumn fx:id="AppointmentUserIDCol" prefWidth="49.0" text="User ID" />
+                                    <TableColumn fx:id="AppointmentContactIDCol" prefWidth="62.0" text="Contact ID" />
                                 </columns>
                               </TableView>
                               <Label layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="171.0" text="Appointments" textFill="#005d6e">
@@ -44,8 +53,6 @@
                                     <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
                                  </font>
                               </Label>
-                              <Button layoutX="375.0" layoutY="13.0" mnemonicParsing="false" text="Search" />
-                              <TextField layoutX="445.0" layoutY="13.0" />
                               <GridPane layoutX="632.0" layoutY="66.0" prefHeight="261.0" prefWidth="159.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -61,20 +68,30 @@
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#onActionOpenAddAppointment" text="Add Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
                                     <Button mnemonicParsing="false" onAction="#onActionOpenModifyAppointment" text="Modify Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
-                                    <Button mnemonicParsing="false" text="Delete Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
-                                    <RadioButton mnemonicParsing="false" text="View All" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
-                                    <RadioButton mnemonicParsing="false" text="View Month" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                                    <RadioButton mnemonicParsing="false" text="View Week" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" onAction="#onActionDeleteAppointment" text="Delete Appointment" GridPane.halignment="LEFT" GridPane.rowIndex="5" GridPane.valignment="CENTER" />
+                                    <RadioButton fx:id="AppointmentViewAllRB" mnemonicParsing="false" onAction="#onActionViewAll" text="View All" GridPane.halignment="LEFT" GridPane.valignment="CENTER">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="CalendarToggle" />
+                                       </toggleGroup></RadioButton>
+                                    <RadioButton fx:id="AppointmentViewMonthRB" mnemonicParsing="false" onAction="#onActionViewMonth" text="View Month" toggleGroup="$CalendarToggle" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                                    <RadioButton fx:id="AppointmentViewWeekRB" mnemonicParsing="false" onAction="#onActionViewWeek" text="View Week" toggleGroup="$CalendarToggle" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                                  </children>
                               </GridPane>
+                              <Button layoutX="372.0" layoutY="12.0" mnemonicParsing="false" onAction="#onActionSearchAppointment" prefHeight="26.0" prefWidth="59.0" text="Search" />
+                              <TextField fx:id="AppointmentSearchText" layoutX="444.0" layoutY="13.0" />
                            </children>
                         </Pane>
                         <Pane prefHeight="237.0" prefWidth="805.0">
                            <children>
-                              <TableView layoutX="14.0" layoutY="40.0" prefHeight="193.0" prefWidth="591.0">
+                              <TableView fx:id="customerTableView" layoutX="14.0" layoutY="40.0" prefHeight="193.0" prefWidth="591.0">
                                 <columns>
-                                  <TableColumn prefWidth="75.0" text="C1" />
-                                  <TableColumn prefWidth="75.0" text="C2" />
+                                  <TableColumn fx:id="CustomerIDCol" prefWidth="76.0" text="Customer ID" />
+                                  <TableColumn fx:id="CustomerNameCol" prefWidth="113.0" text="Customer Name" />
+                                    <TableColumn fx:id="CustomerAddressCol" prefWidth="116.0" text="Address" />
+                                    <TableColumn fx:id="CustomerPostalCodeCol" prefWidth="82.0" text="Postal Code" />
+                                    <TableColumn fx:id="CustomerDivisionCol" prefWidth="65.0" text="Division" />
+                                    <TableColumn fx:id="CustomerPhoneCol" prefWidth="62.0" text="Phone" />
+                                    <TableColumn fx:id="CustomerDivisionIDCol" prefWidth="76.0" text="Division ID" />
                                 </columns>
                               </TableView>
                               <Label layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="171.0" text="Customers" textFill="#005d6e">
@@ -82,8 +99,6 @@
                                     <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
                                  </font>
                               </Label>
-                              <Button layoutX="375.0" layoutY="13.0" mnemonicParsing="false" text="Search" />
-                              <TextField layoutX="445.0" layoutY="13.0" />
                               <GridPane layoutX="636.0" layoutY="43.0" prefHeight="140.0" prefWidth="145.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -96,9 +111,11 @@
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#onActionOpenAddCustomer" text="Add Customer" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
                                     <Button mnemonicParsing="false" onAction="#onActionOpenModifyCustomer" text="Modify Customer" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-                                    <Button mnemonicParsing="false" text="Delete Customer" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" onAction="#onActionDeleteCustomer" text="Delete Customer" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                                  </children>
                               </GridPane>
+                              <Button layoutX="273.0" layoutY="13.0" mnemonicParsing="false" onAction="#onActionSearchCustomers" prefHeight="26.0" prefWidth="159.0" text="Search (Customer Name)" />
+                              <TextField fx:id="CustomerSearchText" layoutX="433.0" layoutY="13.0" prefHeight="26.0" prefWidth="171.0" />
                            </children>
                         </Pane>
                      </children>
@@ -108,7 +125,7 @@
             <Pane prefHeight="50.0" prefWidth="807.0">
                <children>
                   <Button layoutX="14.0" layoutY="9.0" mnemonicParsing="false" onAction="#onActionOpenReports" text="Reports" />
-                  <Button layoutX="740.0" layoutY="9.0" mnemonicParsing="false" text="Logoff" />
+                  <Button layoutX="740.0" layoutY="9.0" mnemonicParsing="false" onAction="#onActionLogoff" text="Logoff" />
                </children>
             </Pane>
          </children>
