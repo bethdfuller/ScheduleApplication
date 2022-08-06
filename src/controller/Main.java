@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import misc.Database;
-import misc.LocalDateTimeInterface;
 import model.Appointment;
 import model.Customer;
 
@@ -22,8 +21,9 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -35,25 +35,28 @@ public class Main implements Initializable {
     Stage stage;
     Parent scene;
 
-    //View Toggle Group
+    //Calendar things
+    @FXML private DatePicker datePicker;
     @FXML private ToggleGroup CalendarToggle;
     @FXML private RadioButton AppointmentViewAllRB;
     @FXML private RadioButton AppointmentViewMonthRB;
     @FXML private RadioButton AppointmentViewWeekRB;
+    private boolean calendarWeekly;
+    private boolean calendarMonthly;
 
     //Appointment Table
-    @FXML private TableView<Appointment> appointmentTableView;
-    @FXML private TextField AppointmentSearchText;
-    @FXML private TableColumn<Appointment, Integer> AppointmentIDCol;
-    @FXML private TableColumn<Appointment, String> AppointmentTitleCol;
-    @FXML private TableColumn<Appointment, String> AppointmentDescriptionCol;
-    @FXML private TableColumn<Appointment, String> AppointmentLocationCol;
-    @FXML private TableColumn<Appointment, String> AppointmentTypeCol;
-    @FXML private TableColumn<Appointment, String> AppointmentStartCol;
-    @FXML private TableColumn<Appointment, String> AppointmentEndCol;
-    @FXML private TableColumn<Appointment, Integer> AppointmentCustomerIDCol;
-    @FXML private TableColumn<Appointment, Integer> AppointmentUserIDCol;
-    @FXML private TableColumn<Appointment, Integer> AppointmentContactIDCol;
+    @FXML TableView<Appointment> appointmentTableView;
+    @FXML TextField AppointmentSearchText;
+    @FXML TableColumn<Appointment, Integer> AppointmentIDCol;
+    @FXML TableColumn<Appointment, String> AppointmentTitleCol;
+    @FXML TableColumn<Appointment, String> AppointmentDescriptionCol;
+    @FXML TableColumn<Appointment, String> AppointmentLocationCol;
+    @FXML TableColumn<Appointment, String> AppointmentTypeCol;
+    @FXML TableColumn<Appointment, ZonedDateTime> AppointmentStartCol;
+    @FXML TableColumn<Appointment, ZonedDateTime> AppointmentEndCol;
+    @FXML TableColumn<Appointment, Integer> AppointmentCustomerIDCol;
+    @FXML TableColumn<Appointment, Integer> AppointmentUserIDCol;
+    @FXML TableColumn<Appointment, Integer> AppointmentContactIDCol;
 
     //Customer Table
     @FXML TableView<Customer> customerTableView;
@@ -69,16 +72,26 @@ public class Main implements Initializable {
     private static Customer CustomerToModify;
     private static Appointment AppointmentToModify;
 
+    //Toggle Group - All, Week, Month
+    public void startCalendarToggle() {
+        CalendarToggle = new ToggleGroup();
+        AppointmentViewAllRB.setToggleGroup(CalendarToggle);
+        AppointmentViewMonthRB.setToggleGroup(CalendarToggle);
+        AppointmentViewWeekRB.setToggleGroup(CalendarToggle);
+    }
+
     //Get Customer/Appointment selected object
     public static Customer getCustomerToModify(){return CustomerToModify;}
     public static Appointment getAppointmentToModify(){return AppointmentToModify;}
 
-    //Convert UTC database time to user's local time - Lambda
-    LocalDateTimeInterface convert = (String utcDateTime) -> {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-        LocalDateTime lDateTime = LocalDateTime.parse(utcDateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
-        return  lDateTime;
-    };
+    //Convert UTC database time to user's local time
+    public static LocalDateTime convert (LocalDate Date, String Time) {
+        String string = Date + "" + Time + "00:0";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
+        LocalDateTime dateTime = LocalDateTime.parse(string, formatter);
+        System.out.println(dateTime);
+        return  dateTime;
+    }
 
     //Observable Lists - Appointment & Customer
     ObservableList<Customer> customerTable = FXCollections.observableArrayList();
@@ -88,20 +101,23 @@ public class Main implements Initializable {
 
     }
 
-    @FXML
-    void onActionViewAll(ActionEvent event) {
+    //View All Calendar
+    public void onActionViewAll(ActionEvent event) {
+        AppointmentViewMonthRB.setSelected(false);
+        AppointmentViewMonthRB.setSelected(false);
+
+
+
+
 
     }
 
-    @FXML
-    void onActionViewMonth(ActionEvent event) {
+    //View Month Calendar
+    public void onActionViewMonth() {}
 
-    }
+    //View Week Calendar
+    public void onActionViewWeek() {}
 
-    @FXML
-    void onActionViewWeek(ActionEvent event) {
-
-    }
 
     //Open Add Appointment Screen
     @FXML
@@ -135,6 +151,22 @@ public class Main implements Initializable {
         }
         return null;
 }
+
+    //Fill Appointments
+    public void fillAppointments(ObservableList<Appointment> fillList) {
+        AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("id"));
+        AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
+        AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
+        AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("location"));
+        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("type"));
+        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("start"));
+        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("end"));
+        AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("customerID"));
+        AppointmentUserIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("userID"));
+        AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("contactID"));
+
+        appointmentTableView.setItems(fillList);
+    }
 
     //Search Customer Name Button
     @FXML
@@ -236,6 +268,19 @@ public class Main implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
+
+        //Populate initial table view to View All
+        AppointmentViewAllRB.setSelected(true);
+        startCalendarToggle();
+
+        ObservableList<Appointment> allAppointments = null;
+        try {
+            allAppointments = Appointment.getAllAppointments();
+        }
+        catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        fillAppointments(allAppointments);
 
         //Customer Database Table
         Connection connect;
