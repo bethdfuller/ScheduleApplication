@@ -43,6 +43,8 @@ public class Login implements Initializable {
 
     //Login
     public void onActionLogin(ActionEvent event) throws IOException {
+
+
         String username = usernameField.getText();
         String password = passwordField.getText();
         boolean verifiedUser = User.login(username, password);
@@ -50,17 +52,15 @@ public class Login implements Initializable {
 
             //Log successful login
             Log.logEvent(username, true, "Login");
-
-
             stage = (Stage)((Button)event.getSource()).getScene().getWindow();
             scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
             stage.setScene(new Scene(scene));
             stage.show();
+
         }
         else {
             //Log unsuccessful login
             Log.logEvent(username, false, "Login");
-
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(alertTitle);
             alert.setHeaderText(alertHeader);

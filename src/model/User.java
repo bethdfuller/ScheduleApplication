@@ -27,6 +27,7 @@ public class User {
     //Get/Set
     public static User getPresentUser() {return presentUser;}
     public static Locale getPresentUserLocale(){return presentUserLocale;}
+    public static ZoneId getPresentUserTimeZone(){return presentUserTimeZone;}
 
 
     //Public User

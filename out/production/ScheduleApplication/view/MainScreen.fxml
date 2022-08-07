@@ -77,7 +77,7 @@
                                        </toggleGroup></RadioButton>
                                     <RadioButton fx:id="AppointmentViewMonthRB" mnemonicParsing="false" onAction="#onActionViewMonth" text="View Month" toggleGroup="$CalendarToggle" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
                                     <RadioButton fx:id="AppointmentViewWeekRB" mnemonicParsing="false" onAction="#onActionViewWeek" text="View Week" toggleGroup="$CalendarToggle" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-                                    <DatePicker promptText="Select Date" />
+                                    <DatePicker fx:id="pickDate" onAction="#onActionPickDate" promptText="Select Date" />
                                  </children>
                               </GridPane>
                               <Button layoutX="372.0" layoutY="12.0" mnemonicParsing="false" onAction="#onActionSearchAppointment" prefHeight="26.0" prefWidth="59.0" text="Search" />

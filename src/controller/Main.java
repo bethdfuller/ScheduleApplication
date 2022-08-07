@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import misc.ConvertTimeZoneInterface;
 import misc.Database;
 import model.Appointment;
 import model.Customer;
@@ -21,9 +22,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -36,7 +35,7 @@ public class Main implements Initializable {
     Parent scene;
 
     //Calendar things
-    @FXML private DatePicker datePicker;
+    @FXML private DatePicker pickDate;
     @FXML private ToggleGroup CalendarToggle;
     @FXML private RadioButton AppointmentViewAllRB;
     @FXML private RadioButton AppointmentViewMonthRB;
@@ -47,16 +46,22 @@ public class Main implements Initializable {
     //Appointment Table
     @FXML TableView<Appointment> appointmentTableView;
     @FXML TextField AppointmentSearchText;
-    @FXML TableColumn<Appointment, Integer> AppointmentIDCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentIDCol;
     @FXML TableColumn<Appointment, String> AppointmentTitleCol;
     @FXML TableColumn<Appointment, String> AppointmentDescriptionCol;
     @FXML TableColumn<Appointment, String> AppointmentLocationCol;
     @FXML TableColumn<Appointment, String> AppointmentTypeCol;
-    @FXML TableColumn<Appointment, ZonedDateTime> AppointmentStartCol;
-    @FXML TableColumn<Appointment, ZonedDateTime> AppointmentEndCol;
-    @FXML TableColumn<Appointment, Integer> AppointmentCustomerIDCol;
-    @FXML TableColumn<Appointment, Integer> AppointmentUserIDCol;
-    @FXML TableColumn<Appointment, Integer> AppointmentContactIDCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentStartCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentEndCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentCustomerIDCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentUserIDCol;
+    @FXML
+    TableColumn<Appointment, String> AppointmentContactIDCol;
 
     //Customer Table
     @FXML TableView<Customer> customerTableView;
@@ -72,6 +77,19 @@ public class Main implements Initializable {
     private static Customer CustomerToModify;
     private static Appointment AppointmentToModify;
 
+    ZonedDateTime startDateRange;
+    ZonedDateTime endDateRange;
+
+    ConvertTimeZoneInterface conversion = (String dateTime) -> {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ldt =  LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+        return ldt;
+    };
+
+    @FXML private void AppointmentViewWeekRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewWeek();}
+    @FXML private void AppointmentViewMonthRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewMonth();}
+    @FXML private void AppointmentViewAllRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewAll();}
+
     //Toggle Group - All, Week, Month
     public void startCalendarToggle() {
         CalendarToggle = new ToggleGroup();
@@ -84,15 +102,6 @@ public class Main implements Initializable {
     public static Customer getCustomerToModify(){return CustomerToModify;}
     public static Appointment getAppointmentToModify(){return AppointmentToModify;}
 
-    //Convert UTC database time to user's local time
-    public static LocalDateTime convert (LocalDate Date, String Time) {
-        String string = Date + "" + Time + "00:0";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");
-        LocalDateTime dateTime = LocalDateTime.parse(string, formatter);
-        System.out.println(dateTime);
-        return  dateTime;
-    }
-
     //Observable Lists - Appointment & Customer
     ObservableList<Customer> customerTable = FXCollections.observableArrayList();
     ObservableList<Appointment> appointmentTable = FXCollections.observableArrayList();
@@ -101,22 +110,69 @@ public class Main implements Initializable {
 
     }
 
+    //Date Picker Action
+    @FXML private void onActionPickDate() throws IOException, SQLException, ClassNotFoundException {
+        if (calendarWeekly) {
+            onActionViewWeek();
+        }
+        else if (calendarMonthly) {
+            onActionViewMonth();
+        }
+        else {
+            onActionViewAll();
+        }
+    }
+
     //View All Calendar
-    public void onActionViewAll(ActionEvent event) {
-        AppointmentViewMonthRB.setSelected(false);
-        AppointmentViewMonthRB.setSelected(false);
+    public void onActionViewAll() {
+        calendarWeekly = false;
+        calendarMonthly = false;
+
+        Connection connect;
+        try {
+            appointmentTable.clear();
+            connect = Database.getConnection();
+            ResultSet allAppointmentResults = connect.createStatement().executeQuery("" +
+                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                    "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
+                    "FROM client_schedule.appointments\n" +
+                    "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
+                    "INNER JOIN client_schedule.users ON appointments.User_ID = users.User_ID\n" +
+                    "INNER JOIN client_schedule.contacts ON appointments.Contact_ID = contacts.Contact_ID");
+            while (allAppointmentResults.next()) {
+                LocalDateTime timeZoneStart = conversion.stringLocalDateTime(allAppointmentResults.getString("Start"));
+                LocalDateTime timeZoneEnd = conversion.stringLocalDateTime(allAppointmentResults.getString("End"));
+                String timeZoneStartString = timeZoneStart.toString().substring(11, 16);
+                String timeZoneEndString = timeZoneEnd.toString().substring(11,16);
+                
+                appointmentTable.add(new Appointment(allAppointmentResults.getString("Appointment_ID"),
+                    allAppointmentResults.getString("Title"),
+                    allAppointmentResults.getString("Description"),
+                    allAppointmentResults.getString("Location"),
+                    allAppointmentResults.getString("Type"),
+                    timeZoneStartString,
+                    timeZoneEndString,
+                    allAppointmentResults.getString("Customer_ID"),
+                    allAppointmentResults.getString("User_ID"),
+                    allAppointmentResults.getString("Contact_ID")));
+            }
+            appointmentTableView.setItems(appointmentTable);
+        } catch (SQLException e) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+            }
+    }
 
 
-
-
+    //View Month Calendar
+    public void onActionViewMonth() throws SQLException, ClassNotFoundException {
 
     }
 
-    //View Month Calendar
-    public void onActionViewMonth() {}
-
     //View Week Calendar
-    public void onActionViewWeek() {}
+    public void onActionViewWeek() throws SQLException, ClassNotFoundException {
+
+
+    }
 
 
     //Open Add Appointment Screen
@@ -154,16 +210,16 @@ public class Main implements Initializable {
 
     //Fill Appointments
     public void fillAppointments(ObservableList<Appointment> fillList) {
-        AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("id"));
+        AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("id"));
         AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
         AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("location"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("type"));
-        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("start"));
-        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, ZonedDateTime>("end"));
-        AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("customerID"));
-        AppointmentUserIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("userID"));
-        AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, Integer>("contactID"));
+        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("start"));
+        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("end"));
+        AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("customerID"));
+        AppointmentUserIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("userID"));
+        AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("contactID"));
 
         appointmentTableView.setItems(fillList);
     }
@@ -269,18 +325,7 @@ public class Main implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
 
-        //Populate initial table view to View All
-        AppointmentViewAllRB.setSelected(true);
-        startCalendarToggle();
 
-        ObservableList<Appointment> allAppointments = null;
-        try {
-            allAppointments = Appointment.getAllAppointments();
-        }
-        catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        fillAppointments(allAppointments);
 
         //Customer Database Table
         Connection connect;
@@ -302,6 +347,18 @@ public class Main implements Initializable {
         } catch (SQLException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("id"));
+        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
+        AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
+        AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("location"));
+        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("type"));
+        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("start"));
+        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("end"));
+        AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("customerID"));
+        AppointmentUserIDCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("userID"));
+        AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("contactID"));
+
 
         CustomerIDCol.setCellValueFactory(new PropertyValueFactory<Customer, Integer>("id"));
         CustomerNameCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("name"));
