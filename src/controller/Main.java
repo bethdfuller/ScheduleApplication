@@ -24,6 +24,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -111,7 +113,7 @@ public class Main implements Initializable {
     }
 
     //Date Picker Action
-    @FXML private void onActionPickDate() throws IOException, SQLException, ClassNotFoundException {
+    @FXML private void onActionPickDate(ActionEvent event) throws IOException, SQLException, ClassNotFoundException {
         if (calendarWeekly) {
             onActionViewWeek();
         }
@@ -142,8 +144,8 @@ public class Main implements Initializable {
             while (allAppointmentResults.next()) {
                 LocalDateTime timeZoneStart = conversion.stringLocalDateTime(allAppointmentResults.getString("Start"));
                 LocalDateTime timeZoneEnd = conversion.stringLocalDateTime(allAppointmentResults.getString("End"));
-                String timeZoneStartString = timeZoneStart.toString().substring(11, 16);
-                String timeZoneEndString = timeZoneEnd.toString().substring(11,16);
+                String timeZoneStartString = timeZoneStart.toString().substring(0, 16);
+                String timeZoneEndString = timeZoneEnd.toString().substring(0,16);
                 
                 appointmentTable.add(new Appointment(allAppointmentResults.getString("Appointment_ID"),
                     allAppointmentResults.getString("Title"),
@@ -165,13 +167,110 @@ public class Main implements Initializable {
 
     //View Month Calendar
     public void onActionViewMonth() throws SQLException, ClassNotFoundException {
+        calendarWeekly = false;
+        calendarMonthly = false;
 
+        LocalDate localDate = pickDate.getValue();
+        String pickMonthString = pickDate.toString().substring(5,7);
+        String pickYearString = pickDate.getValue().toString().substring(0,4);
+
+        System.out.println("Month: " + pickMonthString + "Year: " + pickYearString);
+
+        Connection connect;
+        try {
+            appointmentTable.clear();
+            connect = Database.getConnection();
+            ResultSet weekAppointmentResults = connect.createStatement().executeQuery(String.format(
+                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                            "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
+                            "FROM client_schedule.appointments\n" +
+                            "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
+                            "INNER JOIN client_schedule.users ON appointments.User_ID = users.User_ID\n" +
+                            "INNER JOIN client_schedule.contacts ON appointments.Contact_ID = contacts.Contact_ID\n" +
+                            "WHERE MONTH(Start) = '%s' AND YEAR(Start) = '%s'\n" +
+                            "ORDER BY Start", pickMonthString, pickYearString));
+            while (weekAppointmentResults.next()) {
+                LocalDateTime timeZoneStart = conversion.stringLocalDateTime(weekAppointmentResults.getString("Start"));
+                LocalDateTime timeZoneEnd = conversion.stringLocalDateTime(weekAppointmentResults.getString("End"));
+                String timeZoneStartString = timeZoneStart.toString().substring(0, 16);
+                String timeZoneEndString = timeZoneEnd.toString().substring(0,16);
+
+                appointmentTable.add(new Appointment(weekAppointmentResults.getString("Appointment_ID"),
+                        weekAppointmentResults.getString("Title"),
+                        weekAppointmentResults.getString("Description"),
+                        weekAppointmentResults.getString("Location"),
+                        weekAppointmentResults.getString("Type"),
+                        timeZoneStartString,
+                        timeZoneEndString,
+                        weekAppointmentResults.getString("Customer_ID"),
+                        weekAppointmentResults.getString("User_ID"),
+                        weekAppointmentResults.getString("Contact_ID")));
+            }
+            appointmentTableView.setItems(appointmentTable);
+            if(appointmentTable.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setContentText("No appointments during selected month.");
+                alert.showAndWait();
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     //View Week Calendar
     public void onActionViewWeek() throws SQLException, ClassNotFoundException {
+        calendarWeekly = true;
+        calendarMonthly = false;
 
+        LocalDate localDate = pickDate.getValue();
+        String pickYearString = pickDate.getValue().toString().substring(0,4);
+        WeekFields weekFields = WeekFields.of(Locale.US);
+        int pickWeek = localDate.get(weekFields.weekOfWeekBasedYear());
+        String pickWeekString = Integer.toString(pickWeek);
 
+        System.out.println("Week: " + pickWeekString + "Year: " + pickYearString);
+
+        Connection connect;
+        try {
+            appointmentTable.clear();
+            connect = Database.getConnection();
+            ResultSet weekAppointmentResults = connect.createStatement().executeQuery(String.format(
+                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                    "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
+                    "FROM client_schedule.appointments\n" +
+                    "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
+                    "INNER JOIN client_schedule.users ON appointments.User_ID = users.User_ID\n" +
+                    "INNER JOIN client_schedule.contacts ON appointments.Contact_ID = contacts.Contact_ID\n" +
+                    "WHERE WEEK(DATE(Start))+1 = '%s' AND YEAR(Start) = '%s'\n" +
+                    "ORDER BY Start", pickWeek, pickYearString));
+            while (weekAppointmentResults.next()) {
+                LocalDateTime timeZoneStart = conversion.stringLocalDateTime(weekAppointmentResults.getString("Start"));
+                LocalDateTime timeZoneEnd = conversion.stringLocalDateTime(weekAppointmentResults.getString("End"));
+                String timeZoneStartString = timeZoneStart.toString().substring(0, 16);
+                String timeZoneEndString = timeZoneEnd.toString().substring(0,16);
+
+                appointmentTable.add(new Appointment(weekAppointmentResults.getString("Appointment_ID"),
+                        weekAppointmentResults.getString("Title"),
+                        weekAppointmentResults.getString("Description"),
+                        weekAppointmentResults.getString("Location"),
+                        weekAppointmentResults.getString("Type"),
+                        timeZoneStartString,
+                        timeZoneEndString,
+                        weekAppointmentResults.getString("Customer_ID"),
+                        weekAppointmentResults.getString("User_ID"),
+                        weekAppointmentResults.getString("Contact_ID")));
+            }
+            appointmentTableView.setItems(appointmentTable);
+            if(appointmentTable.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setContentText("No appointments during selected week.");
+                    alert.showAndWait();
+                }
+        } catch (SQLException e) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
 
