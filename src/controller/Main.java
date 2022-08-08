@@ -1,3 +1,7 @@
+/**
+ * Main controller
+ */
+
 package controller;
 
 import javafx.collections.FXCollections;
@@ -48,22 +52,16 @@ public class Main implements Initializable {
     //Appointment Table
     @FXML TableView<Appointment> appointmentTableView;
     @FXML TextField AppointmentSearchText;
-    @FXML
-    TableColumn<Appointment, String> AppointmentIDCol;
+    @FXML TableColumn<Appointment, String> AppointmentIDCol;
     @FXML TableColumn<Appointment, String> AppointmentTitleCol;
     @FXML TableColumn<Appointment, String> AppointmentDescriptionCol;
     @FXML TableColumn<Appointment, String> AppointmentLocationCol;
     @FXML TableColumn<Appointment, String> AppointmentTypeCol;
-    @FXML
-    TableColumn<Appointment, String> AppointmentStartCol;
-    @FXML
-    TableColumn<Appointment, String> AppointmentEndCol;
-    @FXML
-    TableColumn<Appointment, String> AppointmentCustomerIDCol;
-    @FXML
-    TableColumn<Appointment, String> AppointmentUserIDCol;
-    @FXML
-    TableColumn<Appointment, String> AppointmentContactIDCol;
+    @FXML TableColumn<Appointment, String> AppointmentStartCol;
+    @FXML TableColumn<Appointment, String> AppointmentEndCol;
+    @FXML TableColumn<Appointment, String> AppointmentCustomerIDCol;
+    @FXML TableColumn<Appointment, String> AppointmentUserIDCol;
+    @FXML TableColumn<Appointment, String> AppointmentContactIDCol;
 
     //Customer Table
     @FXML TableView<Customer> customerTableView;
@@ -82,23 +80,12 @@ public class Main implements Initializable {
     ZonedDateTime startDateRange;
     ZonedDateTime endDateRange;
 
+    //Time Zone conversion lambda
     ConvertTimeZoneInterface conversion = (String dateTime) -> {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ldt =  LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
         return ldt;
     };
-
-    @FXML private void AppointmentViewWeekRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewWeek();}
-    @FXML private void AppointmentViewMonthRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewMonth();}
-    @FXML private void AppointmentViewAllRB (ActionEvent event) throws IOException, SQLException, ClassNotFoundException {onActionViewAll();}
-
-    //Toggle Group - All, Week, Month
-    public void startCalendarToggle() {
-        CalendarToggle = new ToggleGroup();
-        AppointmentViewAllRB.setToggleGroup(CalendarToggle);
-        AppointmentViewMonthRB.setToggleGroup(CalendarToggle);
-        AppointmentViewWeekRB.setToggleGroup(CalendarToggle);
-    }
 
     //Get Customer/Appointment selected object
     public static Customer getCustomerToModify(){return CustomerToModify;}
@@ -113,7 +100,7 @@ public class Main implements Initializable {
     }
 
     //Date Picker Action
-    @FXML private void onActionPickDate(ActionEvent event) throws IOException, SQLException, ClassNotFoundException {
+    @FXML private void onActionPickDate(ActionEvent event) throws SQLException, ClassNotFoundException {
         if (calendarWeekly) {
             onActionViewWeek();
         }
@@ -164,17 +151,16 @@ public class Main implements Initializable {
             }
     }
 
-
     //View Month Calendar
     public void onActionViewMonth() throws SQLException, ClassNotFoundException {
         calendarWeekly = false;
         calendarMonthly = false;
 
         LocalDate localDate = pickDate.getValue();
-        String pickMonthString = pickDate.toString().substring(5,7);
+        String pickMonthString = pickDate.getValue().toString().substring(5,7);
         String pickYearString = pickDate.getValue().toString().substring(0,4);
 
-        System.out.println("Month: " + pickMonthString + "Year: " + pickYearString);
+        System.out.println("Month: " + pickMonthString + " " + "Year: " + pickYearString);
 
         Connection connect;
         try {
@@ -229,7 +215,7 @@ public class Main implements Initializable {
         int pickWeek = localDate.get(weekFields.weekOfWeekBasedYear());
         String pickWeekString = Integer.toString(pickWeek);
 
-        System.out.println("Week: " + pickWeekString + "Year: " + pickYearString);
+        System.out.println("Week: " + pickWeekString + " " + "Year: " + pickYearString);
 
         Connection connect;
         try {
@@ -273,7 +259,6 @@ public class Main implements Initializable {
         }
     }
 
-
     //Open Add Appointment Screen
     @FXML
     void onActionOpenAddAppointment(ActionEvent event) throws IOException {
@@ -297,16 +282,6 @@ public class Main implements Initializable {
 
     }
 
-    //Customer Name Search
-    public Customer lookupCustomer (String searchName) {
-        for (Customer customerSearch : customerTable) {
-            if (customerSearch.getName().equalsIgnoreCase(searchName)) {
-                return customerSearch;
-            }
-        }
-        return null;
-}
-
     //Fill Appointments
     public void fillAppointments(ObservableList<Appointment> fillList) {
         AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("id"));
@@ -321,6 +296,16 @@ public class Main implements Initializable {
         AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("contactID"));
 
         appointmentTableView.setItems(fillList);
+    }
+
+    //Customer Name Search
+    public Customer lookupCustomer (String searchName) {
+        for (Customer customerSearch : customerTable) {
+            if (customerSearch.getName().equalsIgnoreCase(searchName)) {
+                return customerSearch;
+            }
+        }
+        return null;
     }
 
     //Search Customer Name Button
@@ -364,7 +349,7 @@ public class Main implements Initializable {
             stage.setScene(scene);
             stage.show();
         }
-}
+    }
 
     //Delete Customer Button
     @FXML
@@ -423,8 +408,6 @@ public class Main implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
-
-
 
         //Customer Database Table
         Connection connect;

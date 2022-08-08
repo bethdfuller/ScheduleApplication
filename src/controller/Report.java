@@ -1,3 +1,7 @@
+/**
+ * Report controller
+ */
+
 package controller;
 
 import javafx.event.ActionEvent;
@@ -15,6 +19,7 @@ public class Report {
     Stage stage;
     Parent scene;
 
+    //Return to Main Screen
     @FXML
     void onActionCancel(ActionEvent event) throws IOException {
         stage = (Stage) ((Button) event.getSource()).getScene().getWindow();

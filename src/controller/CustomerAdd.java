@@ -1,3 +1,7 @@
+/**
+ * Customer Add controller
+ */
+
 package controller;
 
 import javafx.beans.InvalidationListener;

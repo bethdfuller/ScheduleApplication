@@ -1,3 +1,7 @@
+/**
+ * Login controller
+ */
+
 package controller;
 
 import javafx.scene.control.*;

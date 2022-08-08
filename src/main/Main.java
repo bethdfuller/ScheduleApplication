@@ -1,5 +1,7 @@
 /**
+ * Schedule Application
  * Author: Beth Fuller
+ * Summer 2022
  */
 package main;
 
