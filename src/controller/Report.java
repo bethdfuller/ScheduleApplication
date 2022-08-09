@@ -37,7 +37,6 @@ public class Report implements Initializable {
     @FXML Button onActionContactScheduleButton;
     @FXML Button onActionTypeMonthButton;
     @FXML Button onActionReport3;
-    @FXML Button onActionReset;
     @FXML TextArea reportTextArea;
 
     static ObservableList<String> reports = FXCollections.observableArrayList();
@@ -55,54 +54,55 @@ public class Report implements Initializable {
         reportTextArea.setText(reportTypeMonth());
     }
 
+    //Build Contact report - include: Appointment ID, Title, Type, Description, Start, End, Customer ID
     @FXML
     void ContactScheduleButton(ActionEvent event) throws SQLException {
 
-        StringBuilder contactScheduleString = new StringBuilder();
+        StringBuilder reportContactScheduleString = new StringBuilder();
 
-        String query = "SELECT Appointment_ID, Contact_Name, contacts.Contact_ID, Start\n" +
-                        "FROM appointments\n" +
-                        "JOIN contacts on contacts.Contact_ID = appointments.Contact_ID\n" +
-                        "WHERE start>=NOW()\n" +
-                        "ORDER BY Contact_Name, start";
+        String query = "SELECT Contact_Name, contacts.Contact_ID, Appointment_ID, Title, Type, Description, Start, End, Customer_ID\n" +
+                "FROM appointments\n" +
+                "JOIN contacts on contacts.Contact_ID = appointments.Contact_ID\n" +
+                "WHERE start>=NOW()\n" +
+                "ORDER BY Contact_Name, start";
 
         Statement statement = Database.getConnection().createStatement();
         ResultSet resultSet = statement.executeQuery(query);
 
-        StringBuffer string1 = new StringBuffer();
-        StringBuffer string2 = new StringBuffer();
-        StringBuffer string3 = new StringBuffer();
-        StringBuffer string4 = new StringBuffer();
+        StringBuffer contactScheduleString = new StringBuffer();
 
         while (resultSet.next()) {
-            string1.append(String.format("%s\n", resultSet.getString("Appointment_ID")));
-            string2.append(String.format("%s\n", resultSet.getString("Contact_Name")));
-            string3.append(String.format("%s\n", resultSet.getString("Contact_ID")));
-            string4.append(String.format("%s\n", resultSet.getString("Start")));
-
-
+            //Sort appointments by Contact
+            String contactNameString = "Contact Name: " + resultSet.getString("Contact_Name") + "   " + "Contact ID: " + resultSet.getString("Contact_ID") + "\n";
+            reportContactScheduleString.append(contactNameString);
+            //Appointment information lines
+            while (resultSet.next()) {
+                String appointmentIDString = "Appointment_ID: " + resultSet.getString("Appointment_ID") + "    " + "Title: " + resultSet.getString("Title") + "    " +
+                        "Type: " + resultSet.getString("Type") + "  " + "Description: " + resultSet.getString("Description")+ "    " +
+                        "Start: " + resultSet.getString("Start") + "    " + "End: " + resultSet.getString("End") + "    " + "Customer ID: " + resultSet.getString("Customer_ID") + "\n";
+                reportContactScheduleString.append(appointmentIDString);
+            }
+            statement.close();
+            reportTextArea.setText(String.valueOf(reportContactScheduleString));
         }
-        statement.close();
-
-
-        reportTextArea.setText(string1.toString());
-        reportTextArea.setText(string2.toString());
-        reportTextArea.setText(string3.toString());
     }
 
+    //Generate report w/ total number of appointment per date sorted by date
     @FXML
-    void ReportButton(ActionEvent event) {
-
-    }
-
-
-    public void pressOnActionContactScheduleButton (ActionEvent event) {
-    }
-
-
-    //Reset fields
-    @FXML
-    void ResetButton(ActionEvent event) throws IOException {
+    void ReportButton(ActionEvent event) throws SQLException {
+        StringBuilder reportByDate = new StringBuilder();
+        PreparedStatement countStatment = Database.connection().prepareStatement(
+                "SELECT CAST(Start AS DATE) AS \"dateCount\", COUNT(*) AS \"totalPerDate\"\n" +
+                        "FROM client_schedule.appointments\n" +
+                        "GROUP BY (CAST(Start AS DATE))\n" +
+                        "ORDER BY CAST(Start AS DATE)");
+        ResultSet countResults = countStatment.executeQuery();
+        while (countResults.next()) {
+            String countString = "Date: " + countResults.getString("dateCount") + "  " + "Total Appointments: " + countResults.getString("totalPerDate") + "\n";
+            reportByDate.append(countString);
+        }
+        countStatment.close();
+        reportTextArea.setText(String.valueOf(reportByDate));
     }
 
     //Cancel & Return to Main Screen
@@ -117,7 +117,6 @@ public class Report implements Initializable {
 
     //Generate report w/ the total number of customer appointments by type & month
     public String reportTypeMonth() throws SQLException {
-        Connection connection = Database.connection();
         try {
             StringBuilder reportTypeMonthString = new StringBuilder();
 
@@ -129,12 +128,12 @@ public class Report implements Initializable {
             ResultSet resultsMonth = monthStatement.executeQuery();
 
             while (resultsType.next()) {
-                String stringType = "Appointment Type: " + resultsType.getString("Type") + "///" +
+                String stringType = "Appointment Type: " + resultsType.getString("Type") + "    " +
                         "Total: " + resultsType.getString("Total") + "\n";
                 reportTypeMonthString.append(stringType);
             }
             while (resultsMonth.next()) {
-                String stringMonth = "Appointment Month: " + resultsMonth.getString("Month") + "///" + "Total: " +
+                String stringMonth = "Appointment Month: " + resultsMonth.getString("Month") + "///" + "    " +
                         resultsMonth.getString("Total") + "\n";
                 reportTypeMonthString.append(stringMonth);
 
@@ -146,47 +145,6 @@ public class Report implements Initializable {
         }
         return null;
     }
-
-    //Get All Contacts
-    public static ObservableList<String> getAllContacts() throws SQLException {
-        ObservableList<String> allContacts = FXCollections.observableArrayList();
-        PreparedStatement preparedStatement = Database.connection().prepareStatement("SELECT DISTINCT Contact_Name FROM contacts;");
-        ResultSet resultSet = preparedStatement.executeQuery();
-        while (resultSet.next()) {
-            allContacts.add(resultSet.getString("Contact"));
-        }
-        preparedStatement.close();
-        return allContacts;
-    }
-
-    //Generate report - Contact Schedule (including: Appointment ID, Title, Type, Description, Start, End Customer ID
-    public static ObservableList<String> contactScheduleReport(String contactID) throws SQLException {
-        ObservableList<String> contactScheduleList = FXCollections.observableArrayList();
-            PreparedStatement preparedStatement = Database.connection().prepareStatement(
-                    "SELECT * FROM appointments WHERE Contact_ID = ?");
-            preparedStatement.setString(1, contactID);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                String id = resultSet.getString("Appointment_ID");
-                String title = resultSet.getString("Title");
-                String type = resultSet.getString("Type");
-                String start = resultSet.getString("Start");
-                String end = resultSet.getString("End");
-                String customerID = resultSet.getString("Customer_ID");
-
-                String newLine = "Appointment ID : " + id + "\n";
-                newLine += "Title: " + title + "\n";
-                newLine += "Type: " + type + "\n";
-                newLine += "Start(date/time): " + start + "\n";
-                newLine += "End(date/time): " + end + "\n";
-                newLine += "Customer ID: " + customerID + "\n";
-
-                contactScheduleList.add(newLine);
-            }
-            preparedStatement.close();
-            return contactScheduleList;
-   }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
