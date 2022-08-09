@@ -32,25 +32,14 @@ public class CustomerModify implements Initializable {
     Stage stage;
     Parent scene;
 
+    @FXML Label CustomerIDLabel;
     @FXML TextField CustomerNameText;
     @FXML TextField AddressText;
     @FXML TextField PostalCodeText;
     @FXML TextField PhoneText;
     @FXML ComboBox<String> DivisionComboBox;
 
-    ObservableList<Customer> customerTable = FXCollections.observableArrayList();
-
     private Customer CustomerToModify;
-
-    //Get selected customers information for modification
-    public void modifiedCustomerData (Customer selectCustomer) throws SQLException {
-        CustomerNameText.setText(selectCustomer.getName());
-        AddressText.setText(selectCustomer.getAddress());
-        PostalCodeText.setText(selectCustomer.getPostalCode());
-        PhoneText.setText(selectCustomer.getPhone());
-        DivisionComboBox.setItems(Customer.getAllDivisions());
-        DivisionComboBox.getSelectionModel().select(selectCustomer.getDivision());
-    }
 
     //Save Modified Customer
     @FXML
@@ -110,6 +99,7 @@ public class CustomerModify implements Initializable {
     //Load Customer to Modify from selection
     CustomerToModify = Main.getCustomerToModify();
 
+    CustomerIDLabel.setText(String.valueOf(CustomerToModify.getId()));
     CustomerNameText.setText(CustomerToModify.getName());
     AddressText.setText(CustomerToModify.getAddress());
     PostalCodeText.setText(CustomerToModify.getPostalCode());

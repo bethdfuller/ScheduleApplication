@@ -6,6 +6,7 @@ package model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import misc.Database;
 
 import java.sql.*;
@@ -57,6 +58,7 @@ public class Appointment {
     }
 
 
+
     //Getters/setters
     public String getId() {return id;}
     public String getTitle() {return title;}
@@ -80,6 +82,29 @@ public class Appointment {
     public void setContactID(String contactID) {this.contactID = contactID;}
 
     static ObservableList<String> timeCombo = FXCollections.observableArrayList();
+
+    //Appointment in 15 minutes
+    public static boolean appointmentFifteen () {
+        try {
+            ResultSet appointmentSoon = Database.connection().createStatement().executeQuery(String.format(
+                    "SELECT Appointment_ID, Start\n " +
+                    "FROM appointments\n" +
+                    "WHERE Appointment_ID = '%s' AND Start BETWEEN '%s' AND '%s'",
+                    User.getPresentUser(), LocalDateTime.now(ZoneId.of("UTC")), LocalDateTime.now(ZoneId.of("UTC")).plusMinutes(15)));
+                    appointmentSoon.next();
+
+            String appointmentInfo = appointmentSoon.getString("Appointment_Name" + " " + "Start");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Upcoming Appointment");
+            alert.setContentText("Upcoming Appointment: " + appointmentInfo);
+            alert.showAndWait();
+
+            return true;
+        } catch (SQLException e) {
+            System.out.println("No upcoming appointments.");
+            return false;
+        }
+    }
 
 
     //Add Time to Start/End Combo Boxes
@@ -172,6 +197,12 @@ public class Appointment {
 
     //Check that appointment is inside business hours - 8AM - 10 PM including weekends
     public static boolean businessHoursCheck (String startTime, String endTime, String date) {
+        /**
+         * Time Chart Business Hours:
+         * Alaska: 4:00 AM | 6:00 PM
+         * Business/EST: 8:00 AM - 10:00 PM
+         * UTC: 12:00 PM NOON | 2:00 AM
+         */
         //Convert start & end to UTC
         LocalDateTime startLocal = convertUTCString(startTime, date);
         LocalDateTime endLocal = convertUTCString(endTime, date);
@@ -181,8 +212,8 @@ public class Appointment {
         //Compare Business Hours
         LocalTime compareStart = LocalTime.parse(startUTC);
         LocalTime compareEnd = LocalTime.parse(endUTC);
-        LocalTime openHour = LocalTime.parse("07:59");
-        LocalTime closeHour = LocalTime.parse("22:01");
+        LocalTime openHour = LocalTime.parse("03:59");
+        LocalTime closeHour = LocalTime.parse("18:01");
         Boolean startTimeApprove = compareStart.isAfter(openHour);
         Boolean endTimeApprove = compareEnd.isBefore(closeHour);
 
@@ -204,14 +235,14 @@ public class Appointment {
             String endUTC = localEnd.toString();
 
             ResultSet getDatabaseOverlap = Database.connection().createStatement().executeQuery(String.format(
-                    "SELECT start, end, Customer_Name, Customer_ID\n" +
+                            "SELECT Start, End, Customer_Name\n" +
                             "FROM appointments\n" +
                             "INNER JOIN customers ON appointments.Customer_ID = customers.Customer_ID\n" +
                             "WHERE ('%s' >= Start AND '%s' <= End)\n" +
                             "OR ('%s' <= Start AND '%s' >= End)\n" +
                             "OR ('%s' <= Start AND '%s' >= Start)\n" +
                             "OR ('%s' <= End AND '%s' >= End)",
-                    startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
+                            startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
             getDatabaseOverlap.next();
             System.out.println("Appointment Overlap Occurs: " + getDatabaseOverlap.getString("Customer_Name"));
             return false;

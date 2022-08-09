@@ -7,6 +7,7 @@ package controller;
 import javafx.scene.control.*;
 import misc.Log;
 import misc.TimeZoneInterface;
+import model.Appointment;
 import model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -61,6 +62,12 @@ public class Login implements Initializable {
             stage.setScene(new Scene(scene));
             stage.show();
 
+            if (Appointment.appointmentFifteen()) {
+                System.out.println("Appointment in 15.");
+            }
+            else {
+                System.out.println("No appointment in the next 15 minutes.");
+            }
         }
         else {
             //Log unsuccessful login

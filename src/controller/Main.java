@@ -77,8 +77,6 @@ public class Main implements Initializable {
     private static Customer CustomerToModify;
     private static Appointment AppointmentToModify;
 
-    ZonedDateTime startDateRange;
-    ZonedDateTime endDateRange;
 
     //Time Zone conversion lambda
     ConvertTimeZoneInterface conversion = (String dateTime) -> {
@@ -95,8 +93,25 @@ public class Main implements Initializable {
     ObservableList<Customer> customerTable = FXCollections.observableArrayList();
     ObservableList<Appointment> appointmentTable = FXCollections.observableArrayList();
 
-    @FXML void onActionSearchAppointment(ActionEvent event) {
+    public Appointment lookupAppointment (String searchTitle) {
+        for (Appointment appointmentSearch : appointmentTable) {
+            if (appointmentSearch.getTitle().equalsIgnoreCase(searchTitle)) {
+                return appointmentSearch;
+            }
+        }
+        return null;
+    }
 
+    @FXML void onActionSearchAppointment(ActionEvent event) {
+        String searchAppointmentString = AppointmentSearchText.getText();
+        if (!searchAppointmentString.isEmpty()) {
+            appointmentTableView.getSelectionModel().select(lookupAppointment(searchAppointmentString));
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Appointment not found.");
+            alert.showAndWait();
+        }
     }
 
     //Date Picker Action
@@ -271,31 +286,55 @@ public class Main implements Initializable {
     //Open Modify Appointment Screen
     @FXML
     void onActionOpenModifyAppointment(ActionEvent event) throws IOException {
-        stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-        scene = FXMLLoader.load(getClass().getResource("/view/AppointmentModifyScreen.fxml"));
-        stage.setScene(new Scene(scene));
-        stage.show();
-    }
+        AppointmentToModify = appointmentTableView.getSelectionModel().getSelectedItem();
+
+        //No Customer Selected
+        if (AppointmentToModify == null) {
+            ButtonType ok = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+            Alert alert = new Alert(Alert.AlertType.WARNING, "No appointment selected.", ok);
+            alert.showAndWait();
+            return;}
+        else {
+            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            scene = FXMLLoader.load(getClass().getResource("/view/AppointmentModifyScreen.fxml"));
+            stage.setScene(new Scene(scene));
+            stage.show();
+            }
+        }
 
     @FXML
-    void onActionDeleteAppointment(ActionEvent event) {
+    void onActionDeleteAppointment(ActionEvent event) throws SQLException, IOException {
+        Appointment selectAppointment = appointmentTableView.getSelectionModel().getSelectedItem();
 
-    }
+        if (selectAppointment == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setContentText("No appointment is selected.");
+            alert.showAndWait();
+        }
+        else {
 
-    //Fill Appointments
-    public void fillAppointments(ObservableList<Appointment> fillList) {
-        AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("id"));
-        AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
-        AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
-        AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("location"));
-        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("type"));
-        AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("start"));
-        AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("end"));
-        AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("customerID"));
-        AppointmentUserIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("userID"));
-        AppointmentContactIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("contactID"));
+            ButtonType yes = ButtonType.YES;
+            ButtonType no = ButtonType.NO;
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to delete the selected appointment?", yes, no);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.YES) {
+                Boolean deleteCustomerSuccess = Customer.deleteCustomer(selectAppointment.getId());
+                stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
 
-        appointmentTableView.setItems(fillList);
+                if (deleteCustomerSuccess) {
+                    ButtonType ok = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+                    Alert deletedCustomer = new Alert(Alert.AlertType.CONFIRMATION, "Appointment Deleted", ok);
+                    deletedCustomer.showAndWait();
+                }
+            }
+
+            else return;
+        }
+
     }
 
     //Customer Name Search
@@ -317,7 +356,7 @@ public class Main implements Initializable {
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
-            alert.setHeaderText("Product not found.");
+            alert.setHeaderText("Customer not found.");
             alert.showAndWait();
         }
     }
@@ -409,6 +448,17 @@ public class Main implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
 
+        //Show View All when loading Main Screen
+        CalendarToggle = new ToggleGroup();
+        this.AppointmentViewAllRB.setToggleGroup(CalendarToggle);
+        this.AppointmentViewMonthRB.setToggleGroup(CalendarToggle);
+        this.AppointmentViewWeekRB.setToggleGroup(CalendarToggle);
+        pickDate.setValue(LocalDate.now());
+        calendarWeekly = false;
+        calendarMonthly = false;
+        onActionViewAll();
+
+
         //Customer Database Table
         Connection connect;
         try {
@@ -431,7 +481,7 @@ public class Main implements Initializable {
         }
 
         AppointmentIDCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("id"));
-        AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
+        AppointmentTitleCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("title"));
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
         AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("location"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("type"));

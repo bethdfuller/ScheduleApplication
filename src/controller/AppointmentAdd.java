@@ -142,8 +142,6 @@ public class AppointmentAdd implements Initializable {
         startTimeCombo.setItems(Appointment.getTimeCombo());
         endTimeCombo.setItems(Appointment.getTimeCombo());
 
-
-
         //Populate Customer ID Combo box
         try {
             CustomerIDCombo.setItems(Appointment.getAllCustomerID());
