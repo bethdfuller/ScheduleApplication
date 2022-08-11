@@ -1,3 +1,7 @@
+/**
+ * Log writer
+ */
+
 package misc;
 
 import model.User;

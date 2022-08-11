@@ -44,6 +44,7 @@ public class CustomerModify implements Initializable {
     //Save Modified Customer
     @FXML
     public void onActionSave(ActionEvent event) throws Exception {
+        Integer id = Integer.parseInt(CustomerIDLabel.getText());
         String name = CustomerNameText.getText();
         String address = AddressText.getText();
         String postalCode = PostalCodeText.getText();
@@ -59,7 +60,7 @@ public class CustomerModify implements Initializable {
         }
 
         //Add Customer to Database
-        Boolean success = Customer.updateCustomer(name, address, postalCode, phone, Customer.getDivisionID(division));
+        Boolean success = Customer.updateCustomer(name, address, postalCode, phone, Customer.getDivisionID(division), id);
 
         //Success/Failure Alerts
         if (success) {

@@ -1,3 +1,7 @@
+/**
+ * Database connection
+ */
+
 package misc;
 
 import java.sql.Connection;

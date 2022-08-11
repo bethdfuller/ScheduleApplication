@@ -34,7 +34,7 @@
                         <Font size="10.0" />
                      </font>
                   </Button>
-                  <Button fx:id="onActionReport3" layoutX="377.0" layoutY="16.0" mnemonicParsing="false" onAction="#ReportButton" prefHeight="26.0" prefWidth="97.0" text="Report #3">
+                  <Button fx:id="onActionReport3" layoutX="377.0" layoutY="16.0" mnemonicParsing="false" onAction="#ReportButton" prefHeight="26.0" prefWidth="135.0" text="Total Appointments by Date">
                      <font>
                         <Font size="10.0" />
                      </font>

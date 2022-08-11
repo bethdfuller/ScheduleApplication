@@ -132,25 +132,26 @@ public class Customer {
     }
 
     //Modify Customer
-    public static Boolean updateCustomer(String name, String address, String postalCode, String phone, Integer divisionID) throws SQLException {
+    public static Boolean updateCustomer(String name, String address, String postalCode, String phone,
+                                         Integer divisionID, Integer id) throws SQLException {
 
         //Format Date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         //Insert Customer into SQL Database
         PreparedStatement preparedStatement = Database.connection().prepareStatement(
-                "INSERT INTO customers(Customer_Name, Address, Postal_Code, Phone, Create_Date, Created_By, Last_Update, Last_Updated_By, Division_ID) \n" +
-                        "VALUES(?,?,?,?,?,?,?,?,?);");
+                "UPDATE customers\n" +
+                     "SET Customer_Name=?, Address=?, Postal_Code=?, Phone=?, Last_Update=?, Last_Updated_By=?, Division_ID=?\n" +
+                     "WHERE Customer_ID=?");
 
         preparedStatement.setString(1, name);
         preparedStatement.setString(2, address);
         preparedStatement.setString(3, postalCode);
         preparedStatement.setString(4, phone);
-        preparedStatement.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
+        preparedStatement.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
         preparedStatement.setString(6, User.getPresentUser().getUsername());
-        preparedStatement.setString(7,ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
-        preparedStatement.setString(8, User.getPresentUser().getUsername());
-        preparedStatement.setInt(9, divisionID);
+        preparedStatement.setInt(7, divisionID);
+        preparedStatement.setInt(8, id);
 
         //Run add customer
         try {
@@ -164,7 +165,6 @@ public class Customer {
         }
 
     }
-
 
     //Delete Customer from Database
     public static Boolean deleteCustomer (String customerID) throws SQLException {
@@ -180,7 +180,5 @@ public class Customer {
             return false;
         }
     }
-
-
 
 }

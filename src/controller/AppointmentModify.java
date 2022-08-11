@@ -47,11 +47,11 @@ public class AppointmentModify implements Initializable {
 
     //Save Modified Appointment
     @FXML
-    void onActionSave(ActionEvent event) throws IOException {
+    void onActionSave(ActionEvent event) {
         try {
             //Collect information user has entered
             String appointmentDate = pickAppointmentDate.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
+            String id = AppointmentIDLabel.getText();
             String title = AppointmentTitleText.getText();
             String description = AppointmentDescriptionText.getText();
             String location = AppointmentLocationText.getText();
@@ -59,12 +59,13 @@ public class AppointmentModify implements Initializable {
 
             int startTime = startTimeCombo.getSelectionModel().getSelectedIndex();
             int endTime = endTimeCombo.getSelectionModel().getSelectedIndex();
-            String startTimeString = (String) startTimeCombo.getValue().toString();
-            String endTimeString = (String) endTimeCombo.getValue().toString();
 
-            String customerId = CustomerIDCombo.getValue().toString();
-            String userID = UserIDCombo.getValue().toString();
-            String contactID = ContactIDCombo.getValue().toString();
+            String startTimeString = startTimeCombo.getValue();
+            String endTimeString = endTimeCombo.getValue();
+
+            Integer customerId = Integer.parseInt(CustomerIDCombo.getValue());
+            String userID = UserIDCombo.getValue();
+            String contactID = ContactIDCombo.getValue();
 
             try {
                 if (appointmentDate.isEmpty() || title.isEmpty() || description.isEmpty() || location.isEmpty() ||
@@ -85,21 +86,19 @@ public class AppointmentModify implements Initializable {
                         alert.setContentText("Start and end time cannot be the same.");
                         alert.showAndWait();
                     } else {
-                        if (Appointment.checkOverlap(startTimeString, endTimeString, appointmentDate) && Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
-                            try {
-                                Appointment.addAppointment(appointmentDate, title, description, location, type, startTimeString, endTimeString, customerId, userID, contactID);
-                                System.out.println("Appointment added to database.");
-                                stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-                                scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
-                                stage.setScene(new Scene(scene));
-                                stage.show();
-
-                            } catch (SQLException e) {
-                                System.out.println(e.getMessage());
-                            }
+                        if (Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id) && Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
+                            Appointment.updateAppointment(title, description, location, type, startTimeString, endTimeString, customerId, userID, contactID, id);
+                            ButtonType clickOK = new ButtonType("Successful/Main Screen", ButtonBar.ButtonData.OK_DONE);
+                            Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been successfully updated.", clickOK);
+                            emptyField.showAndWait();
+                            //Return to Main Screen after successful customer Add
+                            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                            scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
+                            stage.setScene(new Scene(scene));
+                            stage.show();
                         }
                         else {
-                            if (!Appointment.checkOverlap(startTimeString, endTimeString, appointmentDate)) {
+                            if (!Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id)) {
                                 Alert alert = new Alert(Alert.AlertType.WARNING);
                                 alert.setTitle("Warning");
                                 alert.setContentText("Appointment could not be scheduled because it overlaps with an existing appointment.");
@@ -148,11 +147,11 @@ public class AppointmentModify implements Initializable {
         AppointmentDescriptionText.setText(AppointmentToModify.getDescription());
         AppointmentLocationText.setText(AppointmentToModify.getLocation());
         AppointmentTypeText.setText(AppointmentToModify.getType());
-        startTimeCombo.getValue();
-        endTimeCombo.getValue();
-        CustomerIDCombo.getValue();
-        UserIDCombo.getValue();
-        ContactIDCombo.getValue();
+        startTimeCombo.getSelectionModel().select(AppointmentToModify.getStart().substring(11,16) + ":00");
+        endTimeCombo.getSelectionModel().select(AppointmentToModify.getEnd().substring(11,16) + ":00");
+        CustomerIDCombo.getSelectionModel().select(AppointmentToModify.getCustomerID());
+        UserIDCombo.getSelectionModel().select(AppointmentToModify.getUserID());
+        ContactIDCombo.getSelectionModel().select(AppointmentToModify.getContactID());
 
         //Time Zone conversion lambda
         ConvertTimeZoneInterface conversion = (String dateTime) -> {

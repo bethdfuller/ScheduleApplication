@@ -44,7 +44,7 @@ public class AppointmentAdd implements Initializable {
     Stage stage;
     Parent scene;
 
-
+    //Save Appointment button
     @FXML
     public void onActionSave(ActionEvent event) throws IOException {
         try {
@@ -121,6 +121,7 @@ public class AppointmentAdd implements Initializable {
         }
     }
 
+    //Cancel button & return to Main Screen
     @FXML
     void onActionCancel(ActionEvent event) throws IOException {
         stage = (Stage) ((Button) event.getSource()).getScene().getWindow();

@@ -302,6 +302,7 @@ public class Main implements Initializable {
             }
         }
 
+    //Delete Appointment
     @FXML
     void onActionDeleteAppointment(ActionEvent event) throws SQLException, IOException {
         Appointment selectAppointment = appointmentTableView.getSelectionModel().getSelectedItem();

@@ -188,12 +188,53 @@ public class Appointment {
 
     }
 
+    //Update Appointment
+    public static Boolean updateAppointment(String title, String description, String location, String type,
+                                         String start, String end, Integer customerID, Integer userID, Integer contactID,
+                                         Integer id) throws SQLException {
+
+        //Insert all data into appointments table
+        PreparedStatement preparedStatement = Database.connection().prepareStatement(
+                "UPDATE appointments\n" +
+                     "SET Title=?, Description=?, Location=?, Type=?, Start=?, End=?, Last_Update=?, Last_Updated_By=?,\n" +
+                        "Customer_ID=?, User_ID=?, Contact_ID=?)\n" +
+                     "WHERE Appointment_ID = ?");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String modifyStartString = start.format(formatter).toString();
+            String modifyEndString = end.format(formatter).toString();
+
+            preparedStatement.setString(1, title);
+            preparedStatement.setString(2, description);
+            preparedStatement.setString(3, location);
+            preparedStatement.setString(4, type);
+            preparedStatement.setString(5, modifyStartString);
+            preparedStatement.setString(6, modifyEndString);
+            preparedStatement.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
+            preparedStatement.setString(8, User.getPresentUser().getUsername());
+            preparedStatement.setInt(9, customerID);
+            preparedStatement.setInt(10, userID);
+            preparedStatement.setInt(11, contactID);
+            preparedStatement.setInt(12, id);
+
+            try {
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+                return true;
+            }
+            catch (SQLException e){
+                e.printStackTrace();
+                return false;
+            }
+    }
+
+
     //User's local date time convert to UTC
     public static LocalDateTime convertUTCString (String time, String date) {
-            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt =  LocalDateTime.parse(date + " " + time, format).atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
-            return ldt;
-        }
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ldt =  LocalDateTime.parse(date + " " + time, format).atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
+        return ldt;
+    }
 
     //Check that appointment is inside business hours - 8AM - 10 PM including weekends
     public static boolean businessHoursCheck (String startTime, String endTime, String date) {
@@ -251,4 +292,43 @@ public class Appointment {
             return true;
         }
     }
+
+    public static boolean checkOverlapSelected (String startTime, String endTime, String date, String customerID, String id) {
+        try {
+            //Convert to format: "YYYY-MM-DD 00:00:00"
+            LocalDateTime localStart = convertUTCString(startTime, date);
+            LocalDateTime localEnd = convertUTCString(endTime, date);
+            String startUTC = localStart.toString();
+            String endUTC = localEnd.toString();
+
+            ResultSet getDatabaseOverlap = Database.connection().createStatement().executeQuery(String.format(
+                    "SELECT Start, End, Customer_ID, Appointment_ID\n" +
+                            "FROM appointments\n" +
+                            "INNER JOIN customers ON appointments.Customer_ID = customers.Customer_ID\n" +
+                            "WHERE ('%s' >= Start AND '%s' <= End)\n" +
+                            "OR ('%s' <= Start AND '%s' >= End)\n" +
+                            "OR ('%s' <= Start AND '%s' >= Start)\n" +
+                            "OR ('%s' <= End AND '%s' >= End)",
+                    startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
+            getDatabaseOverlap.next();
+
+            String startCheck = getDatabaseOverlap.getString("Start").substring(0, 16);
+            String endCheck = getDatabaseOverlap.getString("End").substring(0, 16);
+            String startUTCCheck = startUTC.replace('T', ' ');
+            String endUTCCheck = endUTC.replace('T', ' ');
+
+            if (getDatabaseOverlap.getString("Customer_ID").equals(customerID) && getDatabaseOverlap.getString("Appointment_ID").equals(id)) {
+                System.out.println("Conflicts with current appointment. Current: " + getDatabaseOverlap.getString("Customer_ID"));
+                return true;
+            }
+            else{
+                System.out.println("Check next");
+                System.out.println();
+                return false;
+                }
+        } catch (SQLException e) {
+            return true;
+        }
+    }
+
 }
