@@ -53,7 +53,7 @@ public class Login implements Initializable {
         String username = usernameField.getText();
         String password = passwordField.getText();
         boolean verifiedUser = User.login(username, password);
-        if(verifiedUser == true) {
+        if(verifiedUser) {
 
             //Log successful login
             Log.logEvent(username, true, "Login");

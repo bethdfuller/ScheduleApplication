@@ -38,13 +38,14 @@
                               <TableView fx:id="appointmentTableView" layoutX="14.0" layoutY="40.0" prefHeight="313.0" prefWidth="591.0">
                                 <columns>
                                   <TableColumn fx:id="AppointmentIDCol" prefWidth="39.0" text="Appointment ID" />
-                                  <TableColumn fx:id="AppointmentTitleCol" minWidth="0.0" prefWidth="85.0" text="Title" />
-                                    <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="37.0" text="Description" />
+                                  <TableColumn fx:id="AppointmentTitleCol" minWidth="0.0" prefWidth="63.0" text="Title" />
+                                    <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="59.0" text="Description" />
                                     <TableColumn fx:id="AppointmentLocationCol" prefWidth="37.0" text="Location" />
                                     <TableColumn fx:id="AppointmentTypeCol" prefWidth="43.0" text="Type" />
-                                    <TableColumn fx:id="AppointmentStartCol" prefWidth="108.0" text="Start" />
-                                    <TableColumn fx:id="AppointmentEndCol" prefWidth="108.0" text="End" />
-                                    <TableColumn fx:id="AppointmentCustomerIDCol" prefWidth="41.0" text="Customer ID" />
+                                    <TableColumn fx:id="AppointmentDateCol" prefWidth="49.0" text="Date" />
+                                    <TableColumn fx:id="AppointmentStartCol" prefWidth="90.0" text="Start" />
+                                    <TableColumn fx:id="AppointmentEndCol" prefWidth="94.0" text="End" />
+                                    <TableColumn fx:id="AppointmentCustomerIDCol" prefWidth="99.0" text="Customer ID" />
                                     <TableColumn fx:id="AppointmentUserIDCol" prefWidth="46.0" text="User ID" />
                                     <TableColumn fx:id="AppointmentContactIDCol" prefWidth="46.0" text="Contact ID" />
                                 </columns>

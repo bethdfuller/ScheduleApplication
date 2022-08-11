@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import misc.ConvertTimeZoneInterface;
+import misc.TimeZoneInterface;
 import model.Appointment;
 
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class AppointmentModify implements Initializable {
             String startTimeString = startTimeCombo.getValue();
             String endTimeString = endTimeCombo.getValue();
 
-            Integer customerId = Integer.parseInt(CustomerIDCombo.getValue());
+            String customerId = CustomerIDCombo.getValue();
             String userID = UserIDCombo.getValue();
             String contactID = ContactIDCombo.getValue();
 
@@ -87,7 +88,7 @@ public class AppointmentModify implements Initializable {
                         alert.showAndWait();
                     } else {
                         if (Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id) && Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
-                            Appointment.updateAppointment(title, description, location, type, startTimeString, endTimeString, customerId, userID, contactID, id);
+                            Appointment.updateAppointment(title, description, location, type, appointmentDate, startTimeString, endTimeString, customerId, userID, contactID, id);
                             ButtonType clickOK = new ButtonType("Successful/Main Screen", ButtonBar.ButtonData.OK_DONE);
                             Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been successfully updated.", clickOK);
                             emptyField.showAndWait();
@@ -118,6 +119,10 @@ public class AppointmentModify implements Initializable {
             }
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
+            System.out.println(e.getMessage());
+            ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
+            Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been not been added to the database - check fields.", clickOK);
+            emptyField.showAndWait();
         }
     }
 
@@ -133,13 +138,9 @@ public class AppointmentModify implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         //Load appointment
         AppointmentToModify = Main.getAppointmentToModify();
-
-        //Takes Date from Start to use for Date Picker
-        String dateString = AppointmentToModify.getStart();
-        LocalDateTime localDateTime = LocalDateTime.parse(dateString);
-        pickAppointmentDate.setValue(LocalDate.from(localDateTime));
 
         //Load selected appointment data into the Modify Appointment Screen
         AppointmentIDLabel.setText(String.valueOf(AppointmentToModify.getId()));
@@ -147,18 +148,12 @@ public class AppointmentModify implements Initializable {
         AppointmentDescriptionText.setText(AppointmentToModify.getDescription());
         AppointmentLocationText.setText(AppointmentToModify.getLocation());
         AppointmentTypeText.setText(AppointmentToModify.getType());
+        pickAppointmentDate.setValue(LocalDate.parse(AppointmentToModify.getDate()));
         startTimeCombo.getSelectionModel().select(AppointmentToModify.getStart().substring(11,16) + ":00");
         endTimeCombo.getSelectionModel().select(AppointmentToModify.getEnd().substring(11,16) + ":00");
         CustomerIDCombo.getSelectionModel().select(AppointmentToModify.getCustomerID());
         UserIDCombo.getSelectionModel().select(AppointmentToModify.getUserID());
         ContactIDCombo.getSelectionModel().select(AppointmentToModify.getContactID());
-
-        //Time Zone conversion lambda
-        ConvertTimeZoneInterface conversion = (String dateTime) -> {
-            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt =  LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
-            return ldt;
-        };
 
         //Add times to start/end combo boxes
         startTimeCombo.setItems(Appointment.getTimeCombo());

@@ -15,13 +15,13 @@ import java.time.format.DateTimeFormatter;
 
 public class Appointment {
 
-    String id, title, description, location, type, start, end, createDate, createBy, lastUpdateDate, lastUpdateBy, customerID, userID, contactID;
+    String id, title, description, location, type, date, start, end, createDate, createBy, lastUpdateDate, lastUpdateBy, customerID, userID, contactID;
 
     public Appointment() {
     }
 
     //SHORT - For Main Table View
-    public Appointment(String id, String title, String description, String location, String type,
+    public Appointment(String id, String title, String description, String location, String type, String date,
                        String start, String end, String customerID, String userID, String contactID) {
 
         this.id = id;
@@ -29,6 +29,7 @@ public class Appointment {
         this.description = description;
         this.location = location;
         this.type = type;
+        this.date = date;
         this.start = start;
         this.end = end;
         this.customerID = customerID;
@@ -37,7 +38,7 @@ public class Appointment {
     }
 
     //FULL - For adding to Database - includes everything + create & last update
-    public Appointment(String id, String title, String description, String location, String type,
+    public Appointment(String id, String title, String description, String location, String type, String date,
                        String start, String end, String createDate, String createBy, String lastUpdateDate,
                        String lastUpdateBy, String customerID, String userID, String contactID) {
 
@@ -46,6 +47,7 @@ public class Appointment {
         this.description = description;
         this.location = location;
         this.type = type;
+        this.date = date;
         this.start = start;
         this.end = end;
         this.createDate = createDate;
@@ -61,6 +63,7 @@ public class Appointment {
 
     //Getters/setters
     public String getId() {return id;}
+    public String getDate() {return date;}
     public String getTitle() {return title;}
     public String getDescription() {return description;}
     public String getLocation() {return location;}
@@ -71,6 +74,7 @@ public class Appointment {
     public String getUserID() {return userID;}
     public String getContactID() {return contactID;}
     public void setId(String id) {this.id = id;}
+    public void setDate(String date) {this.date = date;}
     public void setTitle(String title) {this.title = title;}
     public void setDescription(String description) {this.description = description;}
     public void setLocation(String location) {this.location = location;}
@@ -189,9 +193,15 @@ public class Appointment {
     }
 
     //Update Appointment
-    public static Boolean updateAppointment(String title, String description, String location, String type,
-                                         String start, String end, Integer customerID, Integer userID, Integer contactID,
-                                         Integer id) throws SQLException {
+    public static void updateAppointment(String title, String description, String location, String type, String date,
+                                         String start, String end, String customerID, String userID, String contactID,
+                                         String id) throws SQLException {
+
+        //Change start + date to YYYY-MM-DD 00:00:00 / Local to UTC for Database
+        LocalDateTime startLocal = convertUTCString(start, date);
+        LocalDateTime endLocal = convertUTCString(end,date);
+        String startUTC = startLocal.toString();
+        String endUTC = endLocal.toString();
 
         //Insert all data into appointments table
         PreparedStatement preparedStatement = Database.connection().prepareStatement(
@@ -201,30 +211,26 @@ public class Appointment {
                      "WHERE Appointment_ID = ?");
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String modifyStartString = start.format(formatter).toString();
-            String modifyEndString = end.format(formatter).toString();
 
             preparedStatement.setString(1, title);
             preparedStatement.setString(2, description);
             preparedStatement.setString(3, location);
             preparedStatement.setString(4, type);
-            preparedStatement.setString(5, modifyStartString);
-            preparedStatement.setString(6, modifyEndString);
+            preparedStatement.setString(5, startUTC);
+            preparedStatement.setString(6, endUTC);
             preparedStatement.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
             preparedStatement.setString(8, User.getPresentUser().getUsername());
-            preparedStatement.setInt(9, customerID);
-            preparedStatement.setInt(10, userID);
-            preparedStatement.setInt(11, contactID);
-            preparedStatement.setInt(12, id);
+            preparedStatement.setString(9, customerID);
+            preparedStatement.setString(10, userID);
+            preparedStatement.setString(11, contactID);
+            preparedStatement.setString(12, id);
 
             try {
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
-                return true;
             }
             catch (SQLException e){
                 e.printStackTrace();
-                return false;
             }
     }
 

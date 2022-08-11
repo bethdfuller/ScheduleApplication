@@ -66,7 +66,6 @@ public class CustomerAdd implements Initializable {
                 ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
                 Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Customer has been not been added to the database - check fields.", clickOK);
                 emptyField.showAndWait();
-                return;
             }
     }
 

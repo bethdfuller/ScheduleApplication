@@ -112,9 +112,9 @@ public class Customer {
         preparedStatement.setString(2, address);
         preparedStatement.setString(3, postalCode);
         preparedStatement.setString(4, phone);
-        preparedStatement.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
+        preparedStatement.setString(5, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
         preparedStatement.setString(6, User.getPresentUser().getUsername());
-        preparedStatement.setString(7,ZonedDateTime.now(ZoneOffset.UTC).format(formatter).toString());
+        preparedStatement.setString(7, ZonedDateTime.now(ZoneOffset.UTC).format(formatter));
         preparedStatement.setString(8, User.getPresentUser().getUsername());
         preparedStatement.setInt(9, divisionID);
 

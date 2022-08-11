@@ -58,8 +58,8 @@ public class AppointmentAdd implements Initializable {
 
             int startTime = startTimeCombo.getSelectionModel().getSelectedIndex();
             int endTime = endTimeCombo.getSelectionModel().getSelectedIndex();
-            String startTimeString = (String) startTimeCombo.getValue().toString();
-            String endTimeString = (String) endTimeCombo.getValue().toString();
+            String startTimeString = startTimeCombo.getValue().toString();
+            String endTimeString = endTimeCombo.getValue().toString();
 
             String customerId = CustomerIDCombo.getValue().toString();
             String userID = UserIDCombo.getValue().toString();
@@ -118,6 +118,9 @@ public class AppointmentAdd implements Initializable {
             }
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
+            ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
+            Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been not been added to the database - check fields.", clickOK);
+            emptyField.showAndWait();
         }
     }
 
@@ -132,12 +135,6 @@ public class AppointmentAdd implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Time Zone conversion lambda
-        ConvertTimeZoneInterface conversion = (String dateTime) -> {
-            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime ldt =  LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
-            return ldt;
-        };
 
         //Add times to start/end combo boxes
         startTimeCombo.setItems(Appointment.getTimeCombo());

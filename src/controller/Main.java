@@ -57,6 +57,7 @@ public class Main implements Initializable {
     @FXML TableColumn<Appointment, String> AppointmentDescriptionCol;
     @FXML TableColumn<Appointment, String> AppointmentLocationCol;
     @FXML TableColumn<Appointment, String> AppointmentTypeCol;
+    @FXML TableColumn<Appointment, String> AppointmentDateCol;
     @FXML TableColumn<Appointment, String> AppointmentStartCol;
     @FXML TableColumn<Appointment, String> AppointmentEndCol;
     @FXML TableColumn<Appointment, String> AppointmentCustomerIDCol;
@@ -137,7 +138,7 @@ public class Main implements Initializable {
             appointmentTable.clear();
             connect = Database.getConnection();
             ResultSet allAppointmentResults = connect.createStatement().executeQuery("" +
-                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                    "SELECT Appointment_ID, Title, Description, Location, Type, DATE(Start) date, Start, End,\n" +
                     "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
                     "FROM client_schedule.appointments\n" +
                     "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
@@ -154,6 +155,7 @@ public class Main implements Initializable {
                     allAppointmentResults.getString("Description"),
                     allAppointmentResults.getString("Location"),
                     allAppointmentResults.getString("Type"),
+                    allAppointmentResults.getString("Date"),
                     timeZoneStartString,
                     timeZoneEndString,
                     allAppointmentResults.getString("Customer_ID"),
@@ -182,7 +184,7 @@ public class Main implements Initializable {
             appointmentTable.clear();
             connect = Database.getConnection();
             ResultSet weekAppointmentResults = connect.createStatement().executeQuery(String.format(
-                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                    "SELECT Appointment_ID, Title, Description, Location, Type, DATE(Start) date, Start, End,\n" +
                             "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
                             "FROM client_schedule.appointments\n" +
                             "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
@@ -201,6 +203,7 @@ public class Main implements Initializable {
                         weekAppointmentResults.getString("Description"),
                         weekAppointmentResults.getString("Location"),
                         weekAppointmentResults.getString("Type"),
+                        weekAppointmentResults.getString("Date"),
                         timeZoneStartString,
                         timeZoneEndString,
                         weekAppointmentResults.getString("Customer_ID"),
@@ -237,7 +240,7 @@ public class Main implements Initializable {
             appointmentTable.clear();
             connect = Database.getConnection();
             ResultSet weekAppointmentResults = connect.createStatement().executeQuery(String.format(
-                    "SELECT Appointment_ID, Title, Description, Location, Type, Start, End,\n" +
+                    "SELECT Appointment_ID, Title, Description, Location, Type, DATE(Start) Date, Start, End,\n" +
                     "customers.Customer_ID, users.User_ID, contacts.Contact_ID\n" +
                     "FROM client_schedule.appointments\n" +
                     "INNER JOIN client_schedule.customers ON appointments.Customer_ID = customers.Customer_ID\n" +
@@ -256,6 +259,7 @@ public class Main implements Initializable {
                         weekAppointmentResults.getString("Description"),
                         weekAppointmentResults.getString("Location"),
                         weekAppointmentResults.getString("Type"),
+                        weekAppointmentResults.getString("Date"),
                         timeZoneStartString,
                         timeZoneEndString,
                         weekAppointmentResults.getString("Customer_ID"),
@@ -486,6 +490,7 @@ public class Main implements Initializable {
         AppointmentDescriptionCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("description"));
         AppointmentLocationCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("location"));
         AppointmentTypeCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("type"));
+        AppointmentDateCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("date"));
         AppointmentStartCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("start"));
         AppointmentEndCol.setCellValueFactory(new PropertyValueFactory<Appointment, String>("end"));
         AppointmentCustomerIDCol.setCellValueFactory(new PropertyValueFactory<Appointment,String>("customerID"));
