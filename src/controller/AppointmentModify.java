@@ -139,8 +139,18 @@ public class AppointmentModify implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        //Add times to start/end combo boxes
+        startTimeCombo.setItems(Appointment.getTimeCombo());
+        endTimeCombo.setItems(Appointment.getTimeCombo());
+
         //Load appointment
         AppointmentToModify = Main.getAppointmentToModify();
+
+        //Date Pick
+        String appointmentDateString = AppointmentToModify.getDate();
+        LocalDate localDateCal = LocalDate.parse(appointmentDateString);
+        pickAppointmentDate.setValue(localDateCal);
+
 
         //Load selected appointment data into the Modify Appointment Screen
         AppointmentIDLabel.setText(String.valueOf(AppointmentToModify.getId()));
@@ -148,16 +158,14 @@ public class AppointmentModify implements Initializable {
         AppointmentDescriptionText.setText(AppointmentToModify.getDescription());
         AppointmentLocationText.setText(AppointmentToModify.getLocation());
         AppointmentTypeText.setText(AppointmentToModify.getType());
-        pickAppointmentDate.setValue(LocalDate.parse(AppointmentToModify.getDate()));
-        startTimeCombo.getSelectionModel().select(AppointmentToModify.getStart().substring(11,16) + ":00");
-        endTimeCombo.getSelectionModel().select(AppointmentToModify.getEnd().substring(11,16) + ":00");
+        startTimeCombo.setValue(AppointmentToModify.getStart().substring(11,16) + ":00");
+        endTimeCombo.setValue(AppointmentToModify.getEnd().substring(11,16) +":00");
+
         CustomerIDCombo.getSelectionModel().select(AppointmentToModify.getCustomerID());
         UserIDCombo.getSelectionModel().select(AppointmentToModify.getUserID());
         ContactIDCombo.getSelectionModel().select(AppointmentToModify.getContactID());
 
-        //Add times to start/end combo boxes
-        startTimeCombo.setItems(Appointment.getTimeCombo());
-        endTimeCombo.setItems(Appointment.getTimeCombo());
+
 
         //Populate Customer ID Combo box
         try {

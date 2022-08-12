@@ -66,10 +66,10 @@
                         <ComboBox fx:id="ContactIDCombo" prefHeight="26.0" prefWidth="179.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
                         <Label text="Date" GridPane.rowIndex="1" />
                         <DatePicker fx:id="pickAppointmentDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <ComboBox fx:id="startTimeCombo" prefHeight="26.0" prefWidth="185.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         <ComboBox fx:id="endTimeCombo" prefHeight="26.0" prefWidth="195.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                         <Label text="Appointment ID" />
                         <Label fx:id="AppointmentIDLabel" GridPane.columnIndex="1" />
+                        <ComboBox fx:id="startTimeCombo" prefHeight="26.0" prefWidth="192.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                      </children>
                   </GridPane>
                </children>

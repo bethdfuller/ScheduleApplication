@@ -114,22 +114,22 @@ public class Appointment {
     //Add Time to Start/End Combo Boxes
     public static ObservableList<String> getTimeCombo() {
         try {
-            timeCombo.removeAll(timeCombo);
+            timeCombo.clear();
             for (int i = 0; i < 24; i++ ) {
                 String hour;
-                if(i < 10) {
-                    hour = "0" + i;
+                    if(i < 10) {
+                        hour = "0" + i;
+                    }
+
+                    else {
+                        hour = Integer.toString(i);
+                    }
+                    timeCombo.add(hour + ":00:00");
+                    timeCombo.add(hour + ":15:00");
+                    timeCombo.add(hour + ":30:00");
+                    timeCombo.add(hour + ":45:00");
                 }
 
-                else {
-                    hour = Integer.toString(i);
-                }
-                timeCombo.add(hour + ":00:00");
-                timeCombo.add(hour + ":15:00");
-                timeCombo.add(hour + ":30:00");
-                timeCombo.add(hour + ":45:00");
-            }
-            timeCombo.add("24:00:00");
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
