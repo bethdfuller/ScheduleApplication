@@ -120,7 +120,6 @@ public class Appointment {
                     if(i < 10) {
                         hour = "0" + i;
                     }
-
                     else {
                         hour = Integer.toString(i);
                     }
@@ -129,7 +128,6 @@ public class Appointment {
                     timeCombo.add(hour + ":30:00");
                     timeCombo.add(hour + ":45:00");
                 }
-
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -193,7 +191,7 @@ public class Appointment {
     }
 
     //Update Appointment
-    public static void updateAppointment(String title, String description, String location, String type, String date,
+    public static Boolean updateAppointment(String title, String description, String location, String type, String date,
                                          String start, String end, String customerID, String userID, String contactID,
                                          String id) throws SQLException {
 
@@ -207,8 +205,8 @@ public class Appointment {
         PreparedStatement preparedStatement = Database.connection().prepareStatement(
                 "UPDATE appointments\n" +
                      "SET Title=?, Description=?, Location=?, Type=?, Start=?, End=?, Last_Update=?, Last_Updated_By=?,\n" +
-                        "Customer_ID=?, User_ID=?, Contact_ID=?)\n" +
-                     "WHERE Appointment_ID = ?");
+                        "Customer_ID=?, User_ID=?, Contact_ID=?\n" +
+                     "WHERE Appointment_ID =?");
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -228,9 +226,11 @@ public class Appointment {
             try {
                 preparedStatement.executeUpdate();
                 preparedStatement.close();
+                return true;
             }
             catch (SQLException e){
                 e.printStackTrace();
+                return false;
             }
     }
 
