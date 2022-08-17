@@ -20,16 +20,18 @@ import java.time.format.DateTimeFormatter;
 
 public class Customer {
 
-    String id, name, address, division, postalCode, phone, divisionID;
+    String id, name, address, division, postalCode, phone, divisionID, country;
 
     public Customer () {}
 
-    public Customer(String id, String name, String address, String postalCode, String division,String phone, String divisionID) {
+    //SHORT
+    public Customer(String id, String name, String address, String postalCode, String division, String country, String phone, String divisionID) {
         this.id = id;
         this.name = name;
         this.address = address;
         this.postalCode = postalCode;
         this.division = division;
+        this.country = country;
         this.phone = phone;
         this.divisionID= divisionID;
 
@@ -66,6 +68,7 @@ public class Customer {
         this.phone = phone;
     }
     public String getDivisionID() {return divisionID;}
+    public String getCountry() {return country;}
 
 
     //Get all Divisions
@@ -78,6 +81,37 @@ public class Customer {
         }
         preparedStatement.close();
         return allDivisions;
+    }
+
+    //Get all Countries
+    public static ObservableList<String> getAllCountries() throws SQLException {
+        ObservableList<String> allCountries = FXCollections.observableArrayList();
+        PreparedStatement preparedStatement = Database.connection().prepareStatement("SELECT DISTINCT Country FROM countries");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            allCountries.add(resultSet.getString("Country"));
+        }
+        preparedStatement.close();
+        return allCountries;
+    }
+
+    //Get filtered Division based on User's Country selection
+    public static ObservableList<String> getRelevantDivision (String selectCountry) throws SQLException {
+        ObservableList<String> relevantDivision = FXCollections.observableArrayList();
+        PreparedStatement preparedStatement = Database.connection().prepareStatement(
+                "SELECT c.Country, c.Country_ID, f.Division\n" +
+                     "FROM client_schedule.countries as c\n" +
+                     "RIGHT OUTER JOIN client_schedule.first_level_divisions as f\n" +
+                     "ON c.Country_ID = f.Country_ID\n" +
+                     "WHERE Country = ?");
+        preparedStatement.setString(1, selectCountry);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            relevantDivision.add(resultSet.getString("Division"));
+        }
+        preparedStatement.close();
+        return relevantDivision;
     }
 
     //Get Division ID

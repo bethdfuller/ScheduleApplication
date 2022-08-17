@@ -72,6 +72,7 @@ public class Main implements Initializable {
     @FXML TableColumn<Customer, String> CustomerAddressCol;
     @FXML TableColumn<Customer, String> CustomerPostalCodeCol;
     @FXML TableColumn<Customer, String> CustomerDivisionCol;
+    @FXML TableColumn<Customer, String> CustomerCountryCol;
     @FXML TableColumn<Customer, String> CustomerPhoneCol;
     @FXML TableColumn<Customer, Integer> CustomerDivisionIDCol;
 
@@ -318,13 +319,13 @@ public class Main implements Initializable {
             alert.showAndWait();
         }
         else {
-
             ButtonType yes = ButtonType.YES;
             ButtonType no = ButtonType.NO;
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to delete the selected appointment?", yes, no);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to delete the selected appointment? Appointment ID: " +
+                   selectAppointment.getId() + "    Appointment Type: " + selectAppointment.getType(), yes, no);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.YES) {
-                Boolean deleteCustomerSuccess = Customer.deleteCustomer(selectAppointment.getId());
+                Boolean deleteCustomerSuccess = Appointment.deleteAppointment(selectAppointment.getId());
                 stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
                 scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
                 stage.setScene(new Scene(scene));
@@ -335,6 +336,15 @@ public class Main implements Initializable {
                     Alert deletedCustomer = new Alert(Alert.AlertType.CONFIRMATION, "Appointment Deleted", ok);
                     deletedCustomer.showAndWait();
                 }
+
+                else {
+                    ButtonType ok = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+                    Alert deletedCustomer = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has not been deleted.", ok);
+                    deletedCustomer.showAndWait();
+                }
+
+                appointmentTableView.setItems(appointmentTable);
+
             }
 
             else return;
@@ -469,15 +479,17 @@ public class Main implements Initializable {
         try {
             connect = Database.getConnection();
             ResultSet resultSet = connect.createStatement().executeQuery(
-                    "SELECT Customer_ID, Customer_Name, Address, Postal_Code, Division, Phone, customers.Division_ID\n" +
+                    "SELECT Customer_ID, Customer_Name, Address, Postal_Code, Division, countries.Country, Phone, customers.Division_ID\n" +
                         "FROM client_schedule.customers\n" +
-                        "INNER JOIN client_schedule.first_level_divisions ON customers.Division_ID = first_level_divisions.Division_ID;");
+                        "INNER JOIN client_schedule.first_level_divisions ON customers.Division_ID = first_level_divisions.Division_ID\n" +
+                        "INNER JOIN client_schedule.countries ON first_level_divisions.Country_ID = countries.Country_ID;");
             while (resultSet.next()) {
                 customerTable.add(new Customer(resultSet.getString("Customer_ID"),
                         resultSet.getString("Customer_Name"),
                         resultSet.getString("Address"),
                         resultSet.getString("Postal_Code"),
                         resultSet.getString("Division"),
+                        resultSet.getString("Country"),
                         resultSet.getString("Phone"),
                         resultSet.getString("Division_ID")));
             }
@@ -503,6 +515,7 @@ public class Main implements Initializable {
         CustomerAddressCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("address"));
         CustomerPostalCodeCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("postalCode"));
         CustomerDivisionCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("division"));
+        CustomerCountryCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("country"));
         CustomerPhoneCol.setCellValueFactory(new PropertyValueFactory<Customer, String>("phone"));
         CustomerDivisionIDCol.setCellValueFactory(new PropertyValueFactory<Customer, Integer>("divisionID"));
 

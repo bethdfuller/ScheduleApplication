@@ -48,7 +48,7 @@ public class AppointmentModify implements Initializable {
 
     //Save Modified Appointment
     @FXML
-    void onActionSave(ActionEvent event) {
+    void onActionSave(ActionEvent event) throws IOException {
         try {
             //Collect information user has entered
             String appointmentDate = pickAppointmentDate.getValue().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -68,26 +68,33 @@ public class AppointmentModify implements Initializable {
             String userID = UserIDCombo.getValue();
             String contactID = ContactIDCombo.getValue();
 
-            try {
-                if (appointmentDate.isEmpty() || title.isEmpty() || description.isEmpty() || location.isEmpty() ||
-                        type.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty() || customerId.isEmpty()
-                        || userID.isEmpty() || contactID.isEmpty()) ;
-                else {
-                    //Start time must be before end time
-                    if (endTime < startTime) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Warning");
-                        alert.setContentText("Start time must be before end time.");
-                        alert.showAndWait();
-                    }
-                    //Start and end time must be different
-                    else if (startTime == endTime) {
-                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Warning");
-                        alert.setContentText("Start and end time cannot be the same.");
-                        alert.showAndWait();
-                    } else {
-                        if (Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id) && Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
+
+            if (appointmentDate.isEmpty() || title.isEmpty() || description.isEmpty() || location.isEmpty() ||
+                    type.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty() || customerId.isEmpty()
+                    || userID.isEmpty() || contactID.isEmpty()) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setContentText("Make sure all fields are filled in.");
+                    alert.showAndWait();
+            }
+
+            else {
+                //Start time must be before end time
+                if (endTime < startTime) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setContentText("Start time must be before end time.");
+                    alert.showAndWait();
+                }
+                //Start and end time must be different
+                else if (startTime == endTime) {
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("Warning");
+                    alert.setContentText("Start and end time cannot be the same.");
+                    alert.showAndWait();
+                } else {
+                    if (Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id) && Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
+                        try {
                             Appointment.updateAppointment(title, description, location, type, appointmentDate, startTimeString, endTimeString, customerId, userID, contactID, id);
                             ButtonType clickOK = new ButtonType("Successful/Main Screen", ButtonBar.ButtonData.OK_DONE);
                             Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been successfully updated.", clickOK);
@@ -97,34 +104,37 @@ public class AppointmentModify implements Initializable {
                             scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
                             stage.setScene(new Scene(scene));
                             stage.show();
+                        } catch (SQLException e) {
+                            System.out.println(e.getMessage());
                         }
-                        else {
-                            if (!Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id)) {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Warning");
-                                alert.setContentText("Appointment could not be scheduled because it overlaps with an existing appointment.");
-                                alert.showAndWait();
-                            }
-                            if (!Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Warning");
-                                alert.setContentText("Appointment could not be scheduled because it is not during business hours. Business hours are 8:00 AM - 10:00 PM EST");
-                                alert.showAndWait();
-                            }
+                    }
+
+                    else {
+                        if (!Appointment.checkOverlapSelected(startTimeString, endTimeString, appointmentDate, customerId, id)) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Warning");
+                            alert.setContentText("Appointment could not be scheduled because it overlaps with an existing appointment.");
+                            alert.showAndWait();
+                        }
+                        if (!Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Warning");
+                            alert.setContentText("Appointment could not be scheduled because it is not during business hours. Business hours are 8:00 AM - 10:00 PM EST");
+                            alert.showAndWait();
                         }
                     }
                 }
-            } catch (IOException | SQLException e) {
-                System.out.println(e.getMessage());
             }
-        } catch (NullPointerException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getMessage());
-            ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
-            Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been not been added to the database - check fields.", clickOK);
-            emptyField.showAndWait();
+
+        } catch(NullPointerException | SQLException e) {
+                    System.out.println(e.getMessage());
+                    System.out.println(e.getMessage());
+                    ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
+                    Alert emptyField = new Alert(Alert.AlertType.CONFIRMATION, "Appointment has been not been added to the database - check fields.", clickOK);
+                    emptyField.showAndWait();
         }
     }
+
 
     //Cancel & return to main screen
     @FXML

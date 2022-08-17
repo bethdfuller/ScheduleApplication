@@ -38,6 +38,7 @@ public class CustomerModify implements Initializable {
     @FXML TextField PostalCodeText;
     @FXML TextField PhoneText;
     @FXML ComboBox<String> DivisionComboBox;
+    @FXML ComboBox<String> CountryComboBox;
 
     private Customer CustomerToModify;
 
@@ -50,9 +51,10 @@ public class CustomerModify implements Initializable {
         String postalCode = PostalCodeText.getText();
         String phone = PhoneText.getText();
         String division = DivisionComboBox.getValue();
+        String country = CountryComboBox.getValue();
 
         //Empty field alert to user
-        if (name.isBlank() || address.isBlank() || postalCode.isBlank() || phone.isBlank() || division.isBlank()) {
+        if (name.isBlank() || address.isBlank() || postalCode.isBlank() || phone.isBlank() || division.isBlank() || country.isBlank()) {
             ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
             Alert emptyField = new Alert(Alert.AlertType.ERROR, "Please make sure all fields are filled in.", clickOK);
             emptyField.showAndWait();
@@ -106,11 +108,25 @@ public class CustomerModify implements Initializable {
     PostalCodeText.setText(CustomerToModify.getPostalCode());
     PhoneText.setText(CustomerToModify.getPhone());
     DivisionComboBox.getSelectionModel().select(CustomerToModify.getDivision());
-        try {
-            DivisionComboBox.setItems(Customer.getAllDivisions());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    CountryComboBox.getSelectionModel().select(CustomerToModify.getCountry());
 
+        try {
+            CountryComboBox.setItems(Customer.getAllCountries());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        CountryComboBox.valueProperty().addListener((options, oldValue, newValue) -> {
+            if (newValue == null) {
+                DivisionComboBox.getItems().clear();
+                DivisionComboBox.setDisable(true);
+            } else {
+                DivisionComboBox.setDisable(false);
+                try {
+                    DivisionComboBox.setItems(Customer.getRelevantDivision(CountryComboBox.getValue()));
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        });
+    }
 }

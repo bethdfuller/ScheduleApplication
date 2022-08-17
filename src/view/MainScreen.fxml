@@ -16,38 +16,38 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="700.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Main">
+<AnchorPane prefHeight="900.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Main">
    <children>
-      <VBox layoutX="-2.0" layoutY="-2.0" prefHeight="706.0" prefWidth="807.0">
+      <VBox layoutX="-2.0" layoutY="-2.0" prefHeight="893.0" prefWidth="993.0">
          <children>
-            <Pane prefHeight="55.0" prefWidth="807.0">
+            <Pane prefHeight="39.0" prefWidth="993.0">
                <children>
-                  <Label layoutX="318.0" layoutY="16.0" prefHeight="24.0" prefWidth="171.0" text="Schedule Application" textFill="#005d6e">
+                  <Label layoutX="391.0" layoutY="-3.0" prefHeight="39.0" prefWidth="214.0" text="Schedule Application" textFill="#005d6e">
                      <font>
-                        <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
+                        <Font name="Bodoni 72 Smallcaps Book" size="24.0" />
                      </font>
                   </Label>
                </children>
             </Pane>
-            <Pane prefHeight="620.0" prefWidth="807.0">
+            <Pane prefHeight="804.0" prefWidth="1004.0">
                <children>
-                  <VBox layoutX="2.0" prefHeight="614.0" prefWidth="805.0">
+                  <VBox layoutX="2.0" prefHeight="800.0" prefWidth="1003.0">
                      <children>
-                        <Pane prefHeight="377.0" prefWidth="807.0">
+                        <Pane prefHeight="377.0" prefWidth="1003.0">
                            <children>
-                              <TableView fx:id="appointmentTableView" layoutX="14.0" layoutY="40.0" prefHeight="313.0" prefWidth="591.0">
+                              <TableView fx:id="appointmentTableView" layoutX="14.0" layoutY="40.0" prefHeight="325.0" prefWidth="750.0">
                                 <columns>
                                   <TableColumn fx:id="AppointmentIDCol" prefWidth="39.0" text="Appointment ID" />
-                                  <TableColumn fx:id="AppointmentTitleCol" minWidth="0.0" prefWidth="63.0" text="Title" />
-                                    <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="59.0" text="Description" />
-                                    <TableColumn fx:id="AppointmentLocationCol" prefWidth="37.0" text="Location" />
-                                    <TableColumn fx:id="AppointmentTypeCol" prefWidth="43.0" text="Type" />
-                                    <TableColumn fx:id="AppointmentDateCol" prefWidth="49.0" text="Date" />
-                                    <TableColumn fx:id="AppointmentStartCol" prefWidth="90.0" text="Start" />
-                                    <TableColumn fx:id="AppointmentEndCol" prefWidth="94.0" text="End" />
-                                    <TableColumn fx:id="AppointmentCustomerIDCol" prefWidth="99.0" text="Customer ID" />
-                                    <TableColumn fx:id="AppointmentUserIDCol" prefWidth="46.0" text="User ID" />
-                                    <TableColumn fx:id="AppointmentContactIDCol" prefWidth="46.0" text="Contact ID" />
+                                  <TableColumn fx:id="AppointmentTitleCol" minWidth="0.0" prefWidth="96.79479217529297" text="Title" />
+                                    <TableColumn fx:id="AppointmentDescriptionCol" prefWidth="74.66372680664062" text="Description" />
+                                    <TableColumn fx:id="AppointmentLocationCol" prefWidth="46.762176513671875" text="Location" />
+                                    <TableColumn fx:id="AppointmentTypeCol" prefWidth="48.901611328125" text="Type" />
+                                    <TableColumn fx:id="AppointmentDateCol" prefWidth="81.098388671875" text="Date" />
+                                    <TableColumn fx:id="AppointmentStartCol" prefWidth="111.27877807617188" text="Start" />
+                                    <TableColumn fx:id="AppointmentEndCol" prefWidth="125.57415771484375" text="End" />
+                                    <TableColumn fx:id="AppointmentCustomerIDCol" prefWidth="46.868896484375" text="Customer ID" />
+                                    <TableColumn fx:id="AppointmentUserIDCol" prefWidth="42.0657958984375" text="User ID" />
+                                    <TableColumn fx:id="AppointmentContactIDCol" prefWidth="44.10675048828125" text="Contact ID" />
                                 </columns>
                               </TableView>
                               <Label layoutX="14.0" layoutY="14.0" prefHeight="24.0" prefWidth="171.0" text="Appointments" textFill="#005d6e">
@@ -55,7 +55,7 @@
                                     <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
                                  </font>
                               </Label>
-                              <GridPane layoutX="632.0" layoutY="66.0" prefHeight="261.0" prefWidth="159.0">
+                              <GridPane layoutX="809.0" layoutY="62.0" prefHeight="316.0" prefWidth="148.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
@@ -81,20 +81,21 @@
                                     <DatePicker fx:id="pickDate" onAction="#onActionPickDate" promptText="Select Date" />
                                  </children>
                               </GridPane>
-                              <Button layoutX="372.0" layoutY="12.0" mnemonicParsing="false" onAction="#onActionSearchAppointment" prefHeight="26.0" prefWidth="59.0" text="Search" />
-                              <TextField fx:id="AppointmentSearchText" layoutX="432.0" layoutY="13.0" prefHeight="26.0" prefWidth="171.0" promptText="Appointment Title" />
+                              <Button layoutX="525.0" layoutY="10.0" mnemonicParsing="false" onAction="#onActionSearchAppointment" prefHeight="26.0" prefWidth="59.0" text="Search" />
+                              <TextField fx:id="AppointmentSearchText" layoutX="587.0" layoutY="11.0" prefHeight="26.0" prefWidth="177.0" promptText="Appointment Title" />
                            </children>
                         </Pane>
-                        <Pane prefHeight="237.0" prefWidth="805.0">
+                        <Pane prefHeight="390.0" prefWidth="1003.0">
                            <children>
-                              <TableView fx:id="customerTableView" layoutX="14.0" layoutY="40.0" prefHeight="193.0" prefWidth="591.0">
+                              <TableView fx:id="customerTableView" layoutX="14.0" layoutY="40.0" prefHeight="325.0" prefWidth="750.0">
                                 <columns>
                                   <TableColumn fx:id="CustomerIDCol" prefWidth="76.0" text="Customer ID" />
-                                  <TableColumn fx:id="CustomerNameCol" prefWidth="113.0" text="Customer Name" />
-                                    <TableColumn fx:id="CustomerAddressCol" prefWidth="116.0" text="Address" />
-                                    <TableColumn fx:id="CustomerPostalCodeCol" prefWidth="82.0" text="Postal Code" />
-                                    <TableColumn fx:id="CustomerDivisionCol" prefWidth="65.0" text="Division" />
-                                    <TableColumn fx:id="CustomerPhoneCol" prefWidth="62.0" text="Phone" />
+                                  <TableColumn fx:id="CustomerNameCol" prefWidth="118.5" text="Customer Name" />
+                                    <TableColumn fx:id="CustomerAddressCol" prefWidth="97.5" text="Address" />
+                                    <TableColumn fx:id="CustomerPostalCodeCol" prefWidth="104.0" text="Postal Code" />
+                                    <TableColumn fx:id="CustomerDivisionCol" prefWidth="89.5" text="Division" />
+                                    <TableColumn fx:id="CustomerCountryCol" prefWidth="91.0" text="Country" />
+                                    <TableColumn fx:id="CustomerPhoneCol" prefWidth="96.5" text="Phone" />
                                     <TableColumn fx:id="CustomerDivisionIDCol" prefWidth="76.0" text="Division ID" />
                                 </columns>
                               </TableView>
@@ -103,7 +104,7 @@
                                     <Font name="Bodoni 72 Smallcaps Book" size="20.0" />
                                  </font>
                               </Label>
-                              <GridPane layoutX="636.0" layoutY="43.0" prefHeight="140.0" prefWidth="145.0">
+                              <GridPane layoutX="817.0" layoutY="70.0" prefHeight="210.0" prefWidth="129.0">
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
@@ -111,25 +112,24 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
                                     <Button mnemonicParsing="false" onAction="#onActionOpenAddCustomer" text="Add Customer" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
                                     <Button mnemonicParsing="false" onAction="#onActionOpenModifyCustomer" text="Modify Customer" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
                                     <Button mnemonicParsing="false" onAction="#onActionDeleteCustomer" text="Delete Customer" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+                                    <Button mnemonicParsing="false" onAction="#onActionLogoff" text="Logoff" GridPane.rowIndex="5" />
+                                    <Button mnemonicParsing="false" onAction="#onActionOpenReports" text="Reports" GridPane.rowIndex="4" />
                                  </children>
                               </GridPane>
-                              <Button layoutX="373.0" layoutY="13.0" mnemonicParsing="false" onAction="#onActionSearchCustomers" prefHeight="26.0" prefWidth="59.0" text="Search" />
-                              <TextField fx:id="CustomerSearchText" layoutX="433.0" layoutY="13.0" prefHeight="26.0" prefWidth="171.0" promptText="Customer Name" />
+                              <Button layoutX="521.0" layoutY="11.0" mnemonicParsing="false" onAction="#onActionSearchCustomers" prefHeight="26.0" prefWidth="59.0" text="Search" />
+                              <TextField fx:id="CustomerSearchText" layoutX="586.0" layoutY="11.0" prefHeight="26.0" prefWidth="177.0" promptText="Customer Name" />
                            </children>
                         </Pane>
                      </children>
                   </VBox>
-               </children>
-            </Pane>
-            <Pane prefHeight="50.0" prefWidth="807.0">
-               <children>
-                  <Button layoutX="14.0" layoutY="9.0" mnemonicParsing="false" onAction="#onActionOpenReports" text="Reports" />
-                  <Button layoutX="740.0" layoutY="9.0" mnemonicParsing="false" onAction="#onActionLogoff" text="Logoff" />
                </children>
             </Pane>
          </children>

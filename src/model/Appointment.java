@@ -234,6 +234,21 @@ public class Appointment {
             }
     }
 
+    //Delete Appointment
+    public static Boolean deleteAppointment (String id) throws SQLException {
+        PreparedStatement preparedStatement = Database.connection().prepareStatement("DELETE FROM appointments " +
+                "WHERE Appointment_ID = ?");
+            preparedStatement.setInt(1, Integer.parseInt(id));
+            try {
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     //User's local date time convert to UTC
     public static LocalDateTime convertUTCString (String time, String date) {
@@ -299,7 +314,7 @@ public class Appointment {
         }
     }
 
-    public static boolean checkOverlapSelected (String startTime, String endTime, String date, String customerID, String id) {
+    public static boolean checkOverlapSelected (String startTime, String endTime, String date, String customerID, String id) throws SQLException {
         try {
             //Convert to format: "YYYY-MM-DD 00:00:00"
             LocalDateTime localStart = convertUTCString(startTime, date);
@@ -310,28 +325,27 @@ public class Appointment {
             ResultSet getDatabaseOverlap = Database.connection().createStatement().executeQuery(String.format(
                     "SELECT Start, End, Customer_ID, Appointment_ID\n" +
                             "FROM appointments\n" +
-                            "INNER JOIN customers ON appointments.Customer_ID = customers.Customer_ID\n" +
                             "WHERE ('%s' >= Start AND '%s' <= End)\n" +
                             "OR ('%s' <= Start AND '%s' >= End)\n" +
                             "OR ('%s' <= Start AND '%s' >= Start)\n" +
                             "OR ('%s' <= End AND '%s' >= End)",
-                    startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
+                            startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
             getDatabaseOverlap.next();
+            System.out.println("Appointment Overlap Occurs: " + "Customer ID" + getDatabaseOverlap.getString("Customer_ID"));
 
             String startCheck = getDatabaseOverlap.getString("Start").substring(0, 16);
             String endCheck = getDatabaseOverlap.getString("End").substring(0, 16);
-            String startUTCCheck = startUTC.replace('T', ' ');
-            String endUTCCheck = endUTC.replace('T', ' ');
 
-            if (getDatabaseOverlap.getString("Customer_ID").equals(customerID) && getDatabaseOverlap.getString("Appointment_ID").equals(id)) {
-                System.out.println("Conflicts with current appointment. Current: " + getDatabaseOverlap.getString("Customer_ID"));
-                return true;
-            }
-            else{
-                System.out.println("Check next");
-                System.out.println();
-                return false;
+
+                if (getDatabaseOverlap.getString("Customer_ID").equals(customerID) && getDatabaseOverlap.getString("Appointment_ID").equals(id)) {
+                    System.out.println("Conflicts with current appointment. Current: " + getDatabaseOverlap.getString("Customer_ID") + "Appointment ID: " + getDatabaseOverlap.getString("Appointment_ID"));
+                    return true;
                 }
+                else{
+                    System.out.println("Check next");
+                    System.out.println(getDatabaseOverlap.getString("Customer_ID: ") + " " + customerID + getDatabaseOverlap.getString("Appointment_ID") + id + startCheck + endCheck);
+                    return false;
+                    }
         } catch (SQLException e) {
             return true;
         }

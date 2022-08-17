@@ -16,7 +16,7 @@ import java.util.Locale;
 
 public class Log {
 
-    private static final String  logLocation = "src/misc/logs.txt";
+    private static final String  logLocation = "src/misc/login_activity.txt";
 
     public Log () {}
 
