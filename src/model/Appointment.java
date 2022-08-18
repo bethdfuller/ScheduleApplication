@@ -97,15 +97,18 @@ public class Appointment {
                     User.getPresentUser(), LocalDateTime.now(ZoneId.of("UTC")), LocalDateTime.now(ZoneId.of("UTC")).plusMinutes(15)));
                     appointmentSoon.next();
 
-            String appointmentInfo = appointmentSoon.getString("Appointment_Name" + " " + "Start");
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Upcoming Appointment");
-            alert.setContentText("Upcoming Appointment: " + appointmentInfo);
+            alert.setContentText("Upcoming Appointment\n" + "Appointment ID: " + appointmentSoon.getString("Appointment_ID") +
+                    "   Start: " + appointmentSoon.getString("Start"));
             alert.showAndWait();
 
             return true;
         } catch (SQLException e) {
-            System.out.println("No upcoming appointments.");
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("No Upcoming Appointments");
+            alert.setContentText("No upcoming appointments in the next 15 minutes.");
+            alert.showAndWait();
             return false;
         }
     }
@@ -250,6 +253,13 @@ public class Appointment {
     }
 
 
+    //User's local date time convert to EST
+    public static LocalDateTime convertESTString (String time, String date) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ldt =  LocalDateTime.parse(date + " " + time, format).atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("America/New_York")).toLocalDateTime();
+        return ldt;
+    }
+
     //User's local date time convert to UTC
     public static LocalDateTime convertUTCString (String time, String date) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -262,22 +272,34 @@ public class Appointment {
         /**
          * Time Chart Business Hours:
          * Alaska: 4:00 AM | 6:00 PM
-         * Business/EST: 8:00 AM - 10:00 PM
+         * Business/EST: 8:00 AM - 10:00 PM -Includes weekends
          * UTC: 12:00 PM NOON | 2:00 AM
          */
         //Convert start & end to UTC
-        LocalDateTime startLocal = convertUTCString(startTime, date);
-        LocalDateTime endLocal = convertUTCString(endTime, date);
+        LocalDateTime startLocal = convertESTString(startTime, date);
+        System.out.println("Start Local: " + startLocal);
+        LocalDateTime endLocal = convertESTString(endTime, date);
+        System.out.println("End Local: " + endLocal);
         String startUTC = startLocal.toString().substring(11,16);
+        System.out.println("Start EST: " + startUTC);
         String endUTC = endLocal.toString().substring(11,16);
+        System.out.println("End EST: " + endUTC);
 
         //Compare Business Hours
         LocalTime compareStart = LocalTime.parse(startUTC);
+        System.out.println("Compare Start: " + compareStart);
         LocalTime compareEnd = LocalTime.parse(endUTC);
-        LocalTime openHour = LocalTime.parse("03:59");
-        LocalTime closeHour = LocalTime.parse("18:01");
+        System.out.println("Compare End: " + compareEnd);
+        //New York/East Coast Time
+        LocalTime openHour = LocalTime.parse("07:59");
+        System.out.println("Open Hour: " + openHour);
+        LocalTime closeHour = LocalTime.parse("22:01");
+        System.out.println("Close Hour: " + closeHour);
         Boolean startTimeApprove = compareStart.isAfter(openHour);
+        System.out.println("Start Time Approve: " + startTimeApprove);
         Boolean endTimeApprove = compareEnd.isBefore(closeHour);
+        System.out.println("End Time Approve: " + endTimeApprove);
+
 
         if (startTimeApprove && endTimeApprove) {
             return true;
@@ -297,7 +319,7 @@ public class Appointment {
             String endUTC = localEnd.toString();
 
             ResultSet getDatabaseOverlap = Database.connection().createStatement().executeQuery(String.format(
-                            "SELECT Start, End, Customer_Name\n" +
+                            "SELECT Start, End, Customer_Name, Appointment_ID\n" +
                             "FROM appointments\n" +
                             "INNER JOIN customers ON appointments.Customer_ID = customers.Customer_ID\n" +
                             "WHERE ('%s' >= Start AND '%s' <= End)\n" +
@@ -306,7 +328,11 @@ public class Appointment {
                             "OR ('%s' <= End AND '%s' >= End)",
                             startUTC, startUTC, endUTC, endUTC, startUTC, endUTC, startUTC, endUTC));
             getDatabaseOverlap.next();
-            System.out.println("Appointment Overlap Occurs: " + getDatabaseOverlap.getString("Customer_Name"));
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setContentText("Appointment could not be scheduled because overlap occurs with Appointment_ID: " + getDatabaseOverlap.getString("Appointment_ID") +
+                    "   Customer Name: " + getDatabaseOverlap.getString("Customer_Name"));
+            alert.showAndWait();
             return false;
         } catch (SQLException e) {
             System.out.println("No conflicts exist.");

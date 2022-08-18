@@ -6,8 +6,8 @@ in the United States, United Kingdom and Canada.
 Author: Beth Fuller
     Contact E-mail: bfull65@wgu.edu // bethdfuller@gmail.com
     Contact Phone: (907) 306-3898
-    Version: 1
-    Date: 08/10/2022
+    Version: 2
+    Date: 08/17/2022
 
 IDE: IntelliJ IDEA 2021.2.4 (Community Edition)
      Build #IC-212.5712.43, built on December 21, 2021
@@ -20,12 +20,19 @@ IDE: IntelliJ IDEA 2021.2.4 (Community Edition)
      Non-Bundled Plugins: DBN (3.3.1923.0)
      Kotlin: 212-1.5.10-release-IJ5712.43
 
+JDK Version: jdk-11.0.15.jdk
+
+JavaFX Version: javafx-sdk-17.0.1
+
 Program Directions: Run from src-main-Main file
 
 A3F: The third report created shows the total appointments by date. This will show the company the dates that
 they will be the busiest.
 
 MySQL Connector Driver: mysql-connector-java-8.0.30.jar
+
+
+
 
 Program Rubric Requirements:
 

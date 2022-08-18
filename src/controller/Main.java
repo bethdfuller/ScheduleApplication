@@ -420,7 +420,7 @@ public class Main implements Initializable {
 
                 ButtonType yes = ButtonType.YES;
                 ButtonType no = ButtonType.NO;
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to delete the selected customer?", yes, no);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Do you want to delete the selected customer? Deleting customer will delete all related appointments.", yes, no);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.YES) {
                     Boolean deleteCustomerSuccess = Customer.deleteCustomer(selectCustomer.getId());

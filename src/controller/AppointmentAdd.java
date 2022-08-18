@@ -101,13 +101,13 @@ public class AppointmentAdd implements Initializable {
                             if (!Appointment.checkOverlap(startTimeString, endTimeString, appointmentDate)) {
                                 Alert alert = new Alert(Alert.AlertType.WARNING);
                                 alert.setTitle("Warning");
-                                alert.setContentText("Appointment could not be scheduled because it overlaps with an existing appointment.");
+                                alert.setContentText("Appointment could not be scheduled because of overlap.");
                                 alert.showAndWait();
                             }
                             if (!Appointment.businessHoursCheck(startTimeString, endTimeString, appointmentDate)) {
                                 Alert alert = new Alert(Alert.AlertType.WARNING);
                                 alert.setTitle("Warning");
-                                alert.setContentText("Appointment could not be scheduled because it is not during business hours. Business hours are 8:00 AM - 10:00 PM EST");
+                                alert.setContentText("Appointment could not be scheduled because it is not during business hours. Business hours are 8:00 AM - 10:00 PM EST including weekends.");
                                 alert.showAndWait();
                             }
                         }

@@ -13,14 +13,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import misc.ConvertTimeZoneInterface;
 import misc.Database;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -54,36 +51,83 @@ public class Report implements Initializable {
         reportTextArea.setText(reportTypeMonth());
     }
 
-    //Build Contact report - include: Appointment ID, Title, Type, Description, Start, End, Customer ID
-    @FXML
-    void ContactScheduleButton(ActionEvent event) throws SQLException {
+    //Get all Contacts
+    public static ObservableList<String> getAllContacts() throws SQLException {
+        ObservableList<String> allContacts = FXCollections.observableArrayList();
+        PreparedStatement preparedStatement = Database.connection().prepareStatement("SELECT DISTINCT Contact_Name FROM contacts");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            allContacts.add(resultSet.getString("Contact_Name"));
+        }
+        preparedStatement.close();
+        return allContacts;
+    }
 
-        StringBuilder reportContactScheduleString = new StringBuilder();
+    //Get Contact ID's
+    public static Integer getContactID (String contactName) throws SQLException, Exception{
+        Integer contactID = -1;
+        PreparedStatement preparedStatement = Database.connection().prepareStatement(
+                "SELECT Contact_ID, Contact_Name FROM contacts WHERE Contact_Name = ?");
+        preparedStatement.setString(1, contactName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            contactID = resultSet.getInt("Contact_ID");
+        }
+        preparedStatement.close();
+        return contactID;
+    }
 
-        String query = "SELECT Contact_Name, contacts.Contact_ID, Appointment_ID, Title, Type, Description, Start, End, Customer_ID\n" +
-                "FROM appointments\n" +
-                "JOIN contacts on contacts.Contact_ID = appointments.Contact_ID\n" +
-                "WHERE start>=NOW()\n" +
-                "ORDER BY Contact_Name, start";
+    //Get Contacts appointments as strings
+    public static ObservableList<String> getContactAppointmentStrings (String contactID) throws SQLException {
+        ObservableList<String> appointmentContactString = FXCollections.observableArrayList();
+        PreparedStatement preparedStatement = Database.connection().prepareStatement(
+                "SELECT * FROM appointments WHERE Contact_ID = ?");
 
-        Statement statement = Database.getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(query);
+        preparedStatement.setString(1, contactID);
 
-        StringBuffer contactScheduleString = new StringBuffer();
+        ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
-            //Sort appointments by Contact
-            String contactNameString = "Contact Name: " + resultSet.getString("Contact_Name") + "   " + "Contact ID: " + resultSet.getString("Contact_ID") + "\n";
-            reportContactScheduleString.append(contactNameString);
-            //Appointment information lines
-            while (resultSet.next()) {
-                String appointmentIDString = "Appointment_ID: " + resultSet.getString("Appointment_ID") + "    " + "Title: " + resultSet.getString("Title") + "    " +
-                        "Type: " + resultSet.getString("Type") + "  " + "Description: " + resultSet.getString("Description")+ "    " +
-                        "Start: " + resultSet.getString("Start") + "    " + "End: " + resultSet.getString("End") + "    " + "Customer ID: " + resultSet.getString("Customer_ID") + "\n";
-                reportContactScheduleString.append(appointmentIDString);
+            String appointmentID = resultSet.getString("Appointment_ID");
+            String title = resultSet.getString("Title");
+            String type = resultSet.getString("Type");
+            String description = resultSet.getString("Description");
+            String start = resultSet.getString("Start");
+            String end = resultSet.getString("End");
+            String customerID = resultSet.getString("Customer_ID");
+
+            String line = "Appointment ID: " + appointmentID + "    Title: " + title + "    Type: " + type + "\n";
+            line += "   Description: " + description + "\n";
+            line += "   Start: " + start + "   End: " + end + "\n";
+            line += "   Customer ID: " + customerID + "\n";
+            line += "\n";
+
+            appointmentContactString.add(line);
+        }
+
+        preparedStatement.close();
+        return appointmentContactString;
+
+    }
+
+    //Build Contact report - include: Appointment ID, Title, Type, Description, Start, End, Customer ID
+    @FXML
+    void ContactScheduleButton(ActionEvent event) throws Exception {
+
+        ObservableList<String> listContacts = getAllContacts();
+
+        for (String contact : listContacts) {
+            String contactID = getContactID(contact).toString();
+            reportTextArea.appendText("Contact Name: " + contact + "    ID: " + contactID + "\n");
+
+            ObservableList<String> appointments = getContactAppointmentStrings(contactID);
+            if (appointments.isEmpty()) {
+                reportTextArea.appendText("Contact has no appointments");
             }
-            statement.close();
-            reportTextArea.setText(String.valueOf(reportContactScheduleString));
+            for (String appointment : appointments) {
+                reportTextArea.appendText(appointment);
+            }
+
         }
     }
 
@@ -128,13 +172,13 @@ public class Report implements Initializable {
             ResultSet resultsMonth = monthStatement.executeQuery();
 
             while (resultsType.next()) {
-                String stringType = "Appointment Type: " + resultsType.getString("Type") + "    " +
-                        "Total: " + resultsType.getString("Total") + "\n";
+                String stringType = "Appointment Type: " + resultsType.getString("Type") + "\n" +
+                        "   Total: " + resultsType.getString("Total") + "\n" + "\n";
                 reportTypeMonthString.append(stringType);
             }
             while (resultsMonth.next()) {
-                String stringMonth = "Appointment Month: " + resultsMonth.getString("Month") + "///" + "    " +
-                        resultsMonth.getString("Total") + "\n";
+                String stringMonth = "Appointment Month: " + resultsMonth.getString("Month") + "\n" +
+                       "    Total: " + resultsMonth.getString("Total") + "\n";
                 reportTypeMonthString.append(stringMonth);
 
                 return reportTypeMonthString.toString();
