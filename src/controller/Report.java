@@ -1,6 +1,4 @@
-/**
- * Report controller
- */
+
 
 package controller;
 
@@ -26,6 +24,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
+/**
+ * Report controller. The Time Zone conversion lambda located in the Report method - converts Universal Date Time from the client_schedule database into the User's local Date Time.
+*/
+
 public class Report implements Initializable {
 
     Stage stage;
@@ -38,8 +40,8 @@ public class Report implements Initializable {
 
     static ObservableList<String> reports = FXCollections.observableArrayList();
 
-    //Time Zone conversion lambda
-    ConvertTimeZoneInterface conversion = (String dateTime) -> {
+    //Time conversion Lambda
+    static ConvertTimeZoneInterface conversion = (String dateTime) -> {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ldt = LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
         return ldt;
@@ -92,14 +94,15 @@ public class Report implements Initializable {
             String title = resultSet.getString("Title");
             String type = resultSet.getString("Type");
             String description = resultSet.getString("Description");
-            String start = resultSet.getString("Start");
-            String end = resultSet.getString("End");
+            LocalDateTime start = conversion.stringLocalDateTime(resultSet.getString("Start"));
+            LocalDateTime end = conversion.stringLocalDateTime(resultSet.getString("End"));
             String customerID = resultSet.getString("Customer_ID");
 
-            String line = "Appointment ID: " + appointmentID + "    Title: " + title + "    Type: " + type + "\n";
-            line += "   Description: " + description + "\n";
-            line += "   Start: " + start + "   End: " + end + "\n";
-            line += "   Customer ID: " + customerID + "\n";
+
+            String line = "     Appointment ID: " + appointmentID + "    Title: " + title + "    Type: " + type + "\n";
+            line += "       Description: " + description + "\n";
+            line += "       Start: " + start + "   End: " + end + "\n";
+            line += "       Customer ID: " + customerID + "\n";
             line += "\n";
 
             appointmentContactString.add(line);
@@ -114,11 +117,13 @@ public class Report implements Initializable {
     @FXML
     void ContactScheduleButton(ActionEvent event) throws Exception {
 
+        reportTextArea.clear();
+
         ObservableList<String> listContacts = getAllContacts();
 
         for (String contact : listContacts) {
             String contactID = getContactID(contact).toString();
-            reportTextArea.appendText("Contact Name: " + contact + "    ID: " + contactID + "\n");
+            reportTextArea.appendText("Contact Name:    " + contact + "     ID: " + contactID + "\n");
 
             ObservableList<String> appointments = getContactAppointmentStrings(contactID);
             if (appointments.isEmpty()) {

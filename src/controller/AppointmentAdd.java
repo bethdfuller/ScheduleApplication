@@ -1,6 +1,3 @@
-/**
- * Appointment Add controller
- */
 
 package controller;
 
@@ -25,6 +22,10 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ResourceBundle;
+
+/**
+ * Appointment Add controller
+ */
 
 public class AppointmentAdd implements Initializable {
 
@@ -68,7 +69,13 @@ public class AppointmentAdd implements Initializable {
             try {
                 if (appointmentDate.isEmpty() || title.isEmpty() || description.isEmpty() || location.isEmpty() ||
                         type.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty() || customerId.isEmpty()
-                        || userID.isEmpty() || contactID.isEmpty()) ;
+                        || userID.isEmpty() || contactID.isEmpty()) {
+                        ButtonType clickOK = new ButtonType("Understand", ButtonBar.ButtonData.OK_DONE);
+                        Alert emptyField = new Alert(Alert.AlertType.ERROR, "Please make sure all fields are filled in.", clickOK);
+                        emptyField.showAndWait();
+                        return;
+                        }
+
                 else {
                     //Start time must be before end time
                     if (endTime < startTime) {
@@ -132,6 +139,7 @@ public class AppointmentAdd implements Initializable {
         stage.setScene(new Scene(scene));
         stage.show();
     }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

@@ -1,6 +1,4 @@
-/**
- * Login controller
- */
+
 
 package controller;
 
@@ -21,9 +19,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.ZoneId;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
+/**
+ * Login controller
+ */
 
 public class Login implements Initializable {
 
@@ -47,7 +50,7 @@ public class Login implements Initializable {
     private String alertContent;
 
     //Login
-    public void onActionLogin(ActionEvent event) throws IOException {
+    public void onActionLogin(ActionEvent event) throws IOException, SQLException {
 
 
         String username = usernameField.getText();
@@ -63,7 +66,7 @@ public class Login implements Initializable {
             stage.show();
 
             if (Appointment.appointmentFifteen()) {
-                System.out.println("Appointment in 15.");
+                System.out.println("Appointment in the next 15 minutes.");
             }
             else {
                 System.out.println("No appointment in the next 15 minutes.");

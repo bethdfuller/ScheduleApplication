@@ -1,6 +1,4 @@
-/**
- * Customer Model
- */
+
 
 
 package model;
@@ -17,6 +15,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Customer Model
+ */
 
 public class Customer {
 

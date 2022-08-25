@@ -1,8 +1,4 @@
-/**
- * Schedule Application
- * Author: Beth Fuller
- * Summer 2022
- */
+
 package main;
 
 import javafx.application.Application;
@@ -16,6 +12,12 @@ import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+/**
+ * Schedule Application
+ * Author: Beth Fuller
+ * Summer 2022
+ */
 
 public class Main extends Application {
       @Override

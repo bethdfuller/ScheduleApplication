@@ -1,6 +1,4 @@
-/**
- * Main controller
- */
+
 
 package controller;
 
@@ -34,6 +32,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+/**
+ * Main controller. The Time Zone conversion lambda located in the Main method - converts Universal Date Time from the client_schedule database into the User's local Date Time.
+ */
 
 public class Main implements Initializable {
 
@@ -80,7 +82,8 @@ public class Main implements Initializable {
     private static Appointment AppointmentToModify;
 
 
-    //Time Zone conversion lambda
+
+    //Time Zone conversion lambda - converts Universal Date Time from the client_schedule database into the User's local Date Time
     ConvertTimeZoneInterface conversion = (String dateTime) -> {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime ldt =  LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();

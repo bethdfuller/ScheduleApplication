@@ -1,17 +1,20 @@
-/**
- * Appointment Model
- */
+
 
 package model;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
+import misc.ConvertTimeZoneInterface;
 import misc.Database;
 
 import java.sql.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+
+/**
+ * Appointment Model The Time Zone conversion lambda located in the Report method - converts Universal Date Time from the client_schedule database into the User's local Date Time.
+ */
 
 public class Appointment {
 
@@ -87,30 +90,59 @@ public class Appointment {
 
     static ObservableList<String> timeCombo = FXCollections.observableArrayList();
 
+    //Time conversion Lambda
+    static ConvertTimeZoneInterface conversion = (String dateTime) -> {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime ldt = LocalDateTime.parse(dateTime, format).atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+        return ldt;
+    };
+
     //Appointment in 15 minutes
-    public static boolean appointmentFifteen () {
+    public static boolean appointmentFifteen() {
+
+        Integer userInt = User.getPresentUser().getUserID();
+        System.out.println("User ID: " + userInt);
+
+        StringBuilder upcomingAppointmentsStringBuild = new StringBuilder();
+
+        LocalDateTime newNow = LocalDateTime.now();
+        ZoneId zoneID = ZoneId.systemDefault();
+        ZonedDateTime zonedDateTime = newNow.atZone(zoneID);
+        LocalDateTime localDateTime = zonedDateTime.withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime();
+
+        System.out.println("Start: " + localDateTime);
+        LocalDateTime localDateTime15 = localDateTime.plusMinutes(15);
+
         try {
-            ResultSet appointmentSoon = Database.connection().createStatement().executeQuery(String.format(
-                    "SELECT Appointment_ID, Start\n " +
-                    "FROM appointments\n" +
-                    "WHERE Appointment_ID = '%s' AND Start BETWEEN '%s' AND '%s'",
-                    User.getPresentUser(), LocalDateTime.now(ZoneId.of("UTC")), LocalDateTime.now(ZoneId.of("UTC")).plusMinutes(15)));
-                    appointmentSoon.next();
+            Statement statement = Database.connection().createStatement();
+            String query = "SELECT * FROM appointments WHERE Start BETWEEN '" + localDateTime + "' AND ' " + localDateTime15 + "' AND " + "User_ID='" + userInt + "'";
+            ResultSet resultSet = statement.executeQuery(query);
+            if (resultSet.next()) {
+                String appointmentsUpcoming = "Appointment ID: " + resultSet.getString("Appointment_ID") + " " + "Date/Time: " + conversion.stringLocalDateTime(resultSet.getString("Start"));
+                upcomingAppointmentsStringBuild.append(appointmentsUpcoming);
+                System.out.println(upcomingAppointmentsStringBuild);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Upcoming Appointments");
+                alert.setHeaderText("Upcoming Appointment: " + upcomingAppointmentsStringBuild);
+                alert.showAndWait();
+                return true;
+            }
 
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Upcoming Appointment");
-            alert.setContentText("Upcoming Appointment\n" + "Appointment ID: " + appointmentSoon.getString("Appointment_ID") +
-                    "   Start: " + appointmentSoon.getString("Start"));
-            alert.showAndWait();
-
-            return true;
-        } catch (SQLException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("No Upcoming Appointments");
-            alert.setContentText("No upcoming appointments in the next 15 minutes.");
-            alert.showAndWait();
-            return false;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+
+        System.out.println("False");
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Upcoming Appointments");
+        alert.setHeaderText("No upcoming appointments in the next 15 minutes.");
+        alert.showAndWait();
+        return false;
+    }
+
+
+
+    private static void appointmentAlert(String name) {
     }
 
 

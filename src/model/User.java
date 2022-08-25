@@ -1,6 +1,4 @@
-/**
- * User Model
- */
+
 
 package model;
 
@@ -14,6 +12,10 @@ import java.util.Locale;
 
 import static misc.Database.connection;
 import static misc.Database.getConnection;
+
+/**
+ * User Model
+ */
 
 public class User {
 

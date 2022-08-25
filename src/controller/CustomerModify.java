@@ -1,6 +1,4 @@
-/**
- * Customer Modify appointment
- */
+
 
 package controller;
 
@@ -26,6 +24,11 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+/**
+ * Customer Modify Appointment Controller. The lambda expression takes Country input from the user to create a Division Combo Box that aligns with the selected Country.
+ * It is located in initialize of the Customer Add method @override where the stage is being set.
+ */
 
 public class CustomerModify implements Initializable {
 
@@ -96,6 +99,9 @@ public class CustomerModify implements Initializable {
         stage.show();
     }
 
+    /**
+     * Initazlie the stage & items. The lambda expression takes Country input from the user to create a Division Combo Box that aligns with the selected Country.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -115,6 +121,7 @@ public class CustomerModify implements Initializable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        //Lambda that takes Country input from the user to create a Division Combo Box that aligns with the selected Country
         CountryComboBox.valueProperty().addListener((options, oldValue, newValue) -> {
             if (newValue == null) {
                 DivisionComboBox.getItems().clear();

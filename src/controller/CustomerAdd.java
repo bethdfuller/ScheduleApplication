@@ -1,6 +1,4 @@
-/**
- * Customer Add controller
- */
+
 
 package controller;
 
@@ -19,6 +17,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+
+/**
+ * Customer Add controller. The lambda expression takes Country input from the user to create a Division Combo Box that aligns with the selected Country.
+ * It is located in initialize of the Customer Add method @override where the stage is being set.
+ */
 
 public class CustomerAdd implements Initializable {
 
@@ -106,6 +109,7 @@ public class CustomerAdd implements Initializable {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        //Lambda that takes Country input from the user to create a Division Combo Box that aligns with the selected Country
         CountryComboBox.valueProperty().addListener((options, oldValue, newValue) -> {
             if (newValue == null) {
                 DivisionComboBox.getItems().clear();
