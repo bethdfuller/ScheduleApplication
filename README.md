@@ -1,6 +1,6 @@
 Schedule Application
 
-Purpose: The application is a GUI-based appointment schedule program created with Java with a database. 
+Purpose: The application is a GUI-based appointment schedule program created with Java with a database connection. 
   Highlights: Database functionality, Customers, Appointments, Reporting functionality, Date/Time (UTC in database, local for users) 
 
 Author: Beth Fuller
